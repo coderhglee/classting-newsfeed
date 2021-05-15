@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -7,6 +7,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -25,7 +27,7 @@ export class UserService {
     try {
       return await this.userRepository.findOneOrFail(id);
     } catch (error) {
-      throw new Error(`Not Found User Cause ${error}`);
+      throw new BadRequestException(`Not Found User Cause ${error}`);
     }
   }
 
@@ -36,7 +38,8 @@ export class UserService {
         return this.userRepository.save(updateUser);
       })
       .catch((err) => {
-        throw new Error(`User Update Error cause ${err}`);
+        this.logger.error(`User Update Error cause ${err}`);
+        throw err;
       });
   }
 
@@ -46,7 +49,8 @@ export class UserService {
         return this.userRepository.remove(user);
       })
       .catch((err) => {
-        throw new Error(`User Remove Error cause ${err}`);
+        this.logger.error(`User Remove Error cause ${err}`);
+        throw err;
       });
   }
 }

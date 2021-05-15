@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { BadRequestException } from '@nestjs/common';
 
 const userListFixtures = [
   new User('user_1'),
@@ -90,10 +91,10 @@ describe('UserService', () => {
     it('should throw with message if not found user when update user', async () => {
       jest
         .spyOn(service, 'findOne')
-        .mockRejectedValueOnce(new Error('Not Found User'));
+        .mockRejectedValueOnce(new BadRequestException('Not Found User'));
       await expect(
         service.update(1, { name: 'hglee_update' }),
-      ).rejects.toThrowError('User Update Error cause Error: Not Found User');
+      ).rejects.toThrowError('Not Found User');
     });
   });
 
@@ -101,10 +102,8 @@ describe('UserService', () => {
     it('should throw with message if not found user when remove user', async () => {
       jest
         .spyOn(service, 'findOne')
-        .mockRejectedValueOnce(new Error('Not Found User'));
-      await expect(service.remove(1)).rejects.toThrow(
-        'User Remove Error cause Error: Not Found User',
-      );
+        .mockRejectedValueOnce(new BadRequestException('Not Found User'));
+      await expect(service.remove(1)).rejects.toThrow('Not Found User');
     });
   });
 });
