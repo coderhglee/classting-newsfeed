@@ -58,10 +58,16 @@ describe('UserController', () => {
   });
 
   it('should create a user', () => {
-    const dto = { name: 'user_1' };
+    const dto = {
+      name: 'user_1',
+      password: 'password',
+      roles: ['admin'],
+    };
     expect(controller.create(dto)).toEqual({
       id: expect.any(Number),
       name: dto.name,
+      password: dto.password,
+      roles: dto.roles,
     });
 
     expect(mockUsersService.create).toHaveBeenCalledWith(dto);

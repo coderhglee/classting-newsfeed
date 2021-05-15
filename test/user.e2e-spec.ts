@@ -44,13 +44,15 @@ describe('UserController (e2e)', () => {
   it('/user (POST)', () => {
     return request(app.getHttpServer())
       .post('/user')
-      .send({ name: 'hglee' })
+      .send({ name: 'hglee', password: 'password', roles: ['admin', 'user'] })
       .expect('Content-Type', /json/)
       .expect(201)
       .then((res) => {
         expect(res.body).toEqual({
           id: expect.any(Number),
           name: 'hglee',
+          password: 'password',
+          roles: ['admin', 'user'],
         });
       });
   });
@@ -62,7 +64,11 @@ describe('UserController (e2e)', () => {
       .expect('Content-Type', /json/)
       .expect(400, {
         statusCode: 400,
-        message: ['name must be a string'],
+        message: [
+          'name must be a string',
+          'password must be a string',
+          'roles must be an array',
+        ],
         error: 'Bad Request',
       });
   });

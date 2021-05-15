@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -7,7 +9,20 @@ export class User {
 
   @Column()
   name: string;
-  constructor(name?: string) {
-    this.name = name || '';
+
+  @Exclude()
+  @Column()
+  password: string;
+
+  @Column('simple-array')
+  roles: string[];
+
+  @BeforeInsert()
+  encrypt() {
+    this.password = bcrypt.hashSync(this.password, 10);
+  }
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
   }
 }
