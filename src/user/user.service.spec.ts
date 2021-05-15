@@ -5,22 +5,22 @@ import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 
-const userListFixtures = [
+const multiUserFixture = [
   new User('user_1'),
   new User('user_2'),
   new User('user_3'),
 ];
 
-const userFixtures = new User('user_1');
+const singleUserFixture = new User('user_1');
 
 describe('UserService', () => {
   let service: UserService;
   let repo: Repository<User>;
 
   const mockUserRepository = {
-    find: jest.fn().mockResolvedValue(userListFixtures),
-    findOneOrFail: jest.fn().mockResolvedValue(userFixtures),
-    create: jest.fn().mockReturnValue(userFixtures),
+    find: jest.fn().mockResolvedValue(multiUserFixture),
+    findOneOrFail: jest.fn().mockResolvedValue(singleUserFixture),
+    create: jest.fn().mockReturnValue(singleUserFixture),
     save: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
@@ -48,13 +48,13 @@ describe('UserService', () => {
   describe('findAll', () => {
     it('should return an array of users', async () => {
       const users = await service.findAll();
-      expect(users).toEqual(userListFixtures);
+      expect(users).toEqual(multiUserFixture);
     });
   });
 
   describe('findOne', () => {
     it('should get a single user', () => {
-      expect(service.findOne(1)).resolves.toEqual(userFixtures);
+      expect(service.findOne(1)).resolves.toEqual(singleUserFixture);
     });
 
     it('should throw with message if not found user when find user', async () => {
@@ -69,8 +69,10 @@ describe('UserService', () => {
 
   describe('create', () => {
     it('should create a new user', async () => {
-      jest.spyOn(repo, 'save').mockResolvedValue(userFixtures);
-      expect(await service.create({ name: 'hglee' })).toEqual(userFixtures);
+      jest.spyOn(repo, 'save').mockResolvedValue(singleUserFixture);
+      expect(await service.create({ name: 'hglee' })).toEqual(
+        singleUserFixture,
+      );
     });
   });
 
