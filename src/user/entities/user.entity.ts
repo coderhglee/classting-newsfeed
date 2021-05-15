@@ -5,12 +5,9 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @Column()
-  // password: string;
-
   @Column()
   name: string;
-
-  // @Column()
-  // role: string;
+  constructor(name?: string) {
+    this.name = name || '';
+  }
 }

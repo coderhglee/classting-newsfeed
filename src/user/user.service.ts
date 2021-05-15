@@ -21,19 +21,19 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return this.userRepository.findOne(id).then((user) => {
-      if (!user) {
-        throw new Error(`Not Found User`);
-      }
-      return user;
-    });
+  async findOne(id: number) {
+    try {
+      return await this.userRepository.findOneOrFail(id);
+    } catch (error) {
+      throw new Error(`Not Found User Cause ${error}`);
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.findOne(id)
-      .then(() => {
-        return this.userRepository.update(id, updateUserDto);
+      .then((user) => {
+        const updateUser = { ...user, ...updateUserDto };
+        return this.userRepository.save(updateUser);
       })
       .catch((err) => {
         throw new Error(`User Update Error cause ${err}`);
@@ -42,8 +42,8 @@ export class UserService {
 
   remove(id: number) {
     return this.findOne(id)
-      .then(() => {
-        return this.userRepository.delete(id);
+      .then((user) => {
+        return this.userRepository.remove(user);
       })
       .catch((err) => {
         throw new Error(`User Remove Error cause ${err}`);
