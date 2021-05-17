@@ -30,6 +30,10 @@ export class User {
     return bcrypt.compareSync(inputPassword, this.password);
   }
 
+  hasRole(role: string): boolean {
+    return this.roles.includes(role);
+  }
+
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);
   }
