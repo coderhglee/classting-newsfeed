@@ -3,20 +3,27 @@ import { AuthService } from './../auth/auth.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './../user/entities/user.entity';
 import { UserService } from './../user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let usersService: UserService;
+  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      // imports: [UserModule],
       providers: [
         AuthService,
         {
           provide: UserService,
           useValue: {
             findByName: jest.fn(),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn(),
           },
         },
         {
@@ -28,6 +35,7 @@ describe('AuthService', () => {
 
     authService = module.get<AuthService>(AuthService);
     usersService = module.get<UserService>(UserService);
+    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {
@@ -63,6 +71,20 @@ describe('AuthService', () => {
       expect(
         await authService.validateUser('user_1', 'notpassword'),
       ).toBeNull();
+    });
+  });
+
+  describe('login', () => {
+    it('access token을 발급한다.', async () => {
+      const singleUserFixture = new User({
+        name: 'user_1',
+        password: 'password',
+        roles: ['admin', 'user'],
+      });
+      jest.spyOn(jwtService, 'sign').mockReturnValue('access_token');
+      expect(await authService.login(singleUserFixture)).toStrictEqual({
+        access_token: 'access_token',
+      });
     });
   });
 });

@@ -3,15 +3,11 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppController } from './../src/app.controller';
 import { AppService } from './../src/app.service';
-import { AuthModule } from './../src/auth/auth.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './../src/user/entities/user.entity';
 import { AuthService } from './../src/auth/auth.service';
 import { UserService } from './../src/user/user.service';
-import { UserModule } from './../src/user/user.module';
 import { LocalStrategy } from './../src/auth/local.strategy';
-import { AppModule } from './../src/app.module';
-import { Repository } from 'typeorm';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -31,13 +27,7 @@ describe('AppController (e2e)', () => {
           provide: AuthService,
           useValue: {
             validateUser: jest.fn(),
-            // .mockResolvedValue(
-            //   new User({
-            //     name: 'admin',
-            //     password: 'admin',
-            //     roles: ['admin', 'user'],
-            //   }),
-            // )
+            login: jest.fn(),
           },
         },
         LocalStrategy,
@@ -66,15 +56,14 @@ describe('AppController (e2e)', () => {
     jest
       .spyOn(authService, 'validateUser')
       .mockResolvedValue(singleUserFixture);
+    jest
+      .spyOn(authService, 'login')
+      .mockResolvedValue({ access_token: 'access_token' });
 
     return request(app.getHttpServer())
       .post('/auth/login')
       .send({ username: 'admin', password: 'admin' })
-      .expect(200, {
-        name: 'admin',
-        password: 'admin',
-        roles: ['admin', 'user'],
-      });
+      .expect(200, { access_token: 'access_token' });
   });
 
   it('/auth/login (POST) Return 401 유저 인증 실패', () => {
