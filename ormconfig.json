@@ -2,5 +2,6 @@
   "type": "sqlite",
   "database": "feed-db",
   "entities": ["dist/**/*.entity{.ts,.js}"],
-  "synchronize": true
+  "synchronize": true,
+  "keepConnectionAlive": true
 }

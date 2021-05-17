@@ -1,34 +1,44 @@
-import { JwtService } from '@nestjs/jwt';
+import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
+import { AppModule } from './app.module';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
-import { JwtStrategy } from './auth/strategy/jwt.strategy';
+import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/guard/local-auth.guard';
+import { RolesGuard } from './auth/guard/roles.guard';
 
 describe('AppController', () => {
   let appController: AppController;
 
+  const authGuardMock = {
+    canActivate: (context: ExecutionContext): any => {
+      const req = context.switchToHttp().getRequest();
+      req.user = { id: 1 };
+      return true;
+    },
+  };
+  const rolesGuardMock = { canActivate: (): any => true };
+
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
       controllers: [AppController],
       providers: [
-        {
-          provide: JwtStrategy,
-          useValue: {
-            validate: jest.fn(),
-          },
-        },
-        {
-          provide: JwtService,
-          useValue: {},
-        },
         AppService,
         {
           provide: AuthService,
           useValue: {},
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(RolesGuard)
+      .useValue(rolesGuardMock)
+      .overrideGuard(JwtAuthGuard)
+      .useValue(authGuardMock)
+      .overrideGuard(LocalAuthGuard)
+      .useValue(authGuardMock)
+      .compile();
 
     appController = app.get<AppController>(AppController);
   });

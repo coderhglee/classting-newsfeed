@@ -8,11 +8,14 @@ import { Page } from './entities/page.entity';
 export class PageService {
   constructor(
     @InjectRepository(Page)
-    private pageRepository: Repository<Page>,
+    private readonly pageRepository: Repository<Page>,
   ) {}
 
-  create(createPageDto: CreatePageDto) {
-    const newPage = this.pageRepository.create(createPageDto);
+  create(id: number, createPageDto: CreatePageDto) {
+    const newPage = this.pageRepository.create({
+      ...createPageDto,
+      ownerId: id,
+    });
     return this.pageRepository.save(newPage);
   }
 }

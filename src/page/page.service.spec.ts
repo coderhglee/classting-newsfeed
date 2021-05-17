@@ -38,7 +38,7 @@ describe('PageService', () => {
     });
     jest.spyOn(repo, 'create').mockReturnValue(pageFixture);
     jest.spyOn(repo, 'save').mockResolvedValue(pageFixture);
-    expect(await service.create(pageFixture)).toBe(pageFixture);
+    expect(await service.create(1, pageFixture)).toBe(pageFixture);
     expect(repo.create).toHaveBeenCalledTimes(1);
     expect(repo.save).toHaveBeenCalledTimes(1);
   });

@@ -23,7 +23,7 @@ export class AuthService {
     return this.usersService.findOne(id);
   }
 
-  async login(user: User) {
+  login(user: User) {
     const payload = { userName: user.name, userId: user.id } as TokenPayload;
     return {
       access_token: this.jwtService.sign(payload),
