@@ -6,25 +6,29 @@ import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 
 const multiUserFixture = [
-  new User('user_1'),
-  new User('user_2'),
-  new User('user_3'),
+  new User({ name: 'user_1', password: 'password', roles: ['admin', 'user'] }),
+  new User({ name: 'user_2', password: 'password', roles: ['admin', 'user'] }),
+  new User({ name: 'user_3', password: 'password', roles: ['admin', 'user'] }),
 ];
 
-const singleUserFixture = new User('user_1');
+const singleUserFixture = new User({
+  name: 'user_1',
+  password: 'password',
+  roles: ['admin', 'user'],
+});
+
+const mockUserRepository = {
+  find: jest.fn().mockResolvedValue(multiUserFixture),
+  findOneOrFail: jest.fn().mockResolvedValue(singleUserFixture),
+  create: jest.fn().mockReturnValue(singleUserFixture),
+  save: jest.fn().mockResolvedValue(singleUserFixture),
+  update: jest.fn(),
+  delete: jest.fn(),
+};
 
 describe('UserService', () => {
   let service: UserService;
   let repo: Repository<User>;
-
-  const mockUserRepository = {
-    find: jest.fn().mockResolvedValue(multiUserFixture),
-    findOneOrFail: jest.fn().mockResolvedValue(singleUserFixture),
-    create: jest.fn().mockReturnValue(singleUserFixture),
-    save: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,8 +57,8 @@ describe('UserService', () => {
   });
 
   describe('findOne', () => {
-    it('should get a single user', () => {
-      expect(service.findOne(1)).resolves.toEqual(singleUserFixture);
+    it('should get a single user', async () => {
+      await expect(service.findOne(1)).resolves.toEqual(singleUserFixture);
     });
 
     it('should throw with message if not found user when find user', async () => {
@@ -69,25 +73,27 @@ describe('UserService', () => {
 
   describe('create', () => {
     it('should create a new user', async () => {
-      jest.spyOn(repo, 'save').mockResolvedValue(singleUserFixture);
-      expect(await service.create({ name: 'hglee' })).toEqual(
+      expect(await service.create(singleUserFixture)).toEqual(
         singleUserFixture,
       );
+      expect(repo.save).toHaveBeenCalled();
     });
   });
 
   describe('update', () => {
     it('should update a user', async () => {
-      jest
-        .spyOn(service, 'findOne')
-        .mockResolvedValue({ id: 1, name: 'hglee' });
-      jest
-        .spyOn(repo, 'save')
-        .mockResolvedValue({ id: 1, name: 'hglee_update' });
-      expect(await service.update(1, { name: 'hglee_update' })).toEqual({
-        id: expect.any(Number),
-        name: 'hglee_update',
+      const updateUser = new User({
+        name: 'user_1_update',
+        password: 'password',
+        roles: ['admin', 'user'],
       });
+      jest.spyOn(service, 'findOne').mockResolvedValue(singleUserFixture);
+      jest.spyOn(repo, 'save').mockResolvedValue(updateUser);
+      expect(await service.update(1, { name: updateUser.name })).toEqual(
+        updateUser,
+      );
+      expect(service.findOne).toHaveBeenCalled();
+      expect(repo.save).toHaveBeenCalled();
     });
 
     it('should throw with message if not found user when update user', async () => {
@@ -97,6 +103,7 @@ describe('UserService', () => {
       await expect(
         service.update(1, { name: 'hglee_update' }),
       ).rejects.toThrowError('Not Found User');
+      expect(service.findOne).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -7,7 +7,11 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 150,
+    unique: true,
+  })
   name: string;
 
   @Exclude()
@@ -20,6 +24,10 @@ export class User {
   @BeforeInsert()
   encrypt() {
     this.password = bcrypt.hashSync(this.password, 10);
+  }
+
+  comparePassword(inputPassword: string) {
+    return bcrypt.compareSync(inputPassword, this.password);
   }
 
   constructor(partial: Partial<User>) {

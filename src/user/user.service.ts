@@ -31,6 +31,15 @@ export class UserService {
     }
   }
 
+  async findByName(name: string) {
+    const user = await this.userRepository.findOne({ name });
+    if (!user) {
+      throw new BadRequestException(`사용자를 찾을수 없습니다. Name: ${name}`);
+    }
+
+    return user;
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.findOne(id)
       .then((user) => {
