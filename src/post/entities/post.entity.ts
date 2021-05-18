@@ -27,4 +27,8 @@ export class Post {
 
   @ManyToOne(() => Page, (page) => page.posts)
   page: Page;
+
+  constructor(partial: Partial<Post>) {
+    Object.assign(this, partial);
+  }
 }

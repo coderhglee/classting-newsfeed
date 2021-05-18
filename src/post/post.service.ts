@@ -14,7 +14,7 @@ export class PostService {
     private readonly pageService: PageService,
   ) {}
   async create(createPostDto: CreatePostDto) {
-    this.pageService.findById(createPostDto.pageId).then((page) => {
+    return this.pageService.findById(createPostDto.pageId).then((page) => {
       return this.postRepository.save({
         ...createPostDto,
         page: page,
