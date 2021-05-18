@@ -15,7 +15,7 @@ export class PostService {
     private readonly postRepository: Repository<Post>,
     private readonly pageService: PageService,
   ) {}
-  async create(createPostDto: CreatePostDto) {
+  create(createPostDto: CreatePostDto) {
     return this.pageService.findById(createPostDto.pageId).then((page) => {
       return this.postRepository.save({
         ...createPostDto,
@@ -49,6 +49,14 @@ export class PostService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} post`;
+    return this.findOne(id)
+      .then((post) => {
+        return this.postRepository.remove(post);
+      })
+      .catch((err) => {
+        const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
+        this.logger.error(message);
+        throw new BadRequestException(message);
+      });
   }
 }

@@ -11,6 +11,14 @@ describe('PostService', () => {
   let pageService: PageService;
   let postRepository: Repository<Post>;
 
+  const existPostFixture = {
+    title: 'post title',
+    context: 'post context',
+    pageId: 1,
+    create_at: expect.any(Date),
+    update_at: expect.any(Date),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -25,6 +33,7 @@ describe('PostService', () => {
           provide: getRepositoryToken(Post),
           useValue: {
             save: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
@@ -33,6 +42,10 @@ describe('PostService', () => {
     postService = module.get<PostService>(PostService);
     pageService = module.get<PageService>(PageService);
     postRepository = module.get<Repository<Post>>(getRepositoryToken(Post));
+
+    jest
+      .spyOn(postService, 'findOne')
+      .mockResolvedValue(new Post(existPostFixture));
   });
 
   it('should be defined', () => {
@@ -65,20 +78,10 @@ describe('PostService', () => {
       title: 'post title_update',
       context: 'post context_update',
     };
-    const existPostFixture = {
-      title: 'post title',
-      context: 'post context',
-      pageId: 1,
-      create_at: expect.any(Date),
-      update_at: expect.any(Date),
-    };
     const resultFixture = {
       ...existPostFixture,
       ...updatePostFixture,
     };
-    jest
-      .spyOn(postService, 'findOne')
-      .mockResolvedValue(new Post(existPostFixture));
     jest
       .spyOn(postRepository, 'save')
       .mockResolvedValue(new Post(resultFixture));
@@ -93,14 +96,23 @@ describe('PostService', () => {
       .spyOn(postService, 'findOne')
       .mockRejectedValue(Error('not found user'));
     try {
-      await postService.update(1, {
-        title: 'post title_update',
-        context: 'post context_update',
-      });
+      expect(
+        await postService.update(1, {
+          title: 'post title_update',
+          context: 'post context_update',
+        }),
+      ).toThrow();
     } catch (error) {
       expect(error.message).toBe(
         'Post를 업데이트하는데 실패 하였습니다. ID: 1 exception: Error: not found user',
       );
     }
+  });
+
+  it('페이지 소식 삭제 할수 있다.', async () => {
+    jest
+      .spyOn(postRepository, 'remove')
+      .mockResolvedValue(new Post(existPostFixture));
+    expect(await postService.remove(1)).toEqual(existPostFixture);
   });
 });
