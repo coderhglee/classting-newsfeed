@@ -17,10 +17,11 @@ export class PostService {
   ) {}
   create(createPostDto: CreatePostDto) {
     return this.pageService.findById(createPostDto.pageId).then((page) => {
-      return this.postRepository.save({
+      const newPost = this.postRepository.create({
         ...createPostDto,
         page: page,
       });
+      return this.postRepository.save(newPost);
     });
   }
 

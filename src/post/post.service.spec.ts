@@ -32,6 +32,7 @@ describe('PostService', () => {
         {
           provide: getRepositoryToken(Post),
           useValue: {
+            create: jest.fn(),
             save: jest.fn(),
             remove: jest.fn(),
           },
