@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { PageService } from './page.service';
 import { CreatePageDto } from './dto/create-page.dto';
 import { JwtAuthGuard } from './../auth/guard/jwt-auth.guard';
@@ -15,5 +23,10 @@ export class PageController {
   create(@Request() req, @Body() createPageDto: CreatePageDto) {
     const loginUser = req.user.id;
     return this.pageService.create(loginUser, createPageDto);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.pageService.findById(+id);
   }
 }

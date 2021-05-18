@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { PageModule } from './page/page.module';
 import { User } from './user/entities/user.entity';
 import { Page } from './page/entities/page.entity';
+import { PostModule } from './post/post.module';
+import { Post } from './post/entities/post.entity';
 
 @Module({
   imports: [
@@ -19,14 +21,17 @@ import { Page } from './page/entities/page.entity';
       // username: 'root',
       // password: 'root',
       database: 'feed-db',
-      entities: [User, Page],
+      entities: [User, Page, Post],
+      // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
       keepConnectionAlive: true,
       retryAttempts: 2,
       retryDelay: 1000,
+      logging: true,
     }),
     AuthModule,
     PageModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],

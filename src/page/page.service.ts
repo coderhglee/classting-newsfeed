@@ -18,4 +18,8 @@ export class PageService {
     });
     return this.pageRepository.save(newPage);
   }
+
+  async findById(id: number) {
+    return this.pageRepository.findOne(id);
+  }
 }

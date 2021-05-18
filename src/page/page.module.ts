@@ -9,5 +9,6 @@ import { AuthModule } from './../auth/auth.module';
   imports: [TypeOrmModule.forFeature([Page]), AuthModule],
   controllers: [PageController],
   providers: [PageService],
+  exports: [PageService],
 })
 export class PageModule {}
