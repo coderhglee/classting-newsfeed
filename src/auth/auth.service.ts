@@ -23,6 +23,14 @@ export class AuthService {
     return this.usersService.findOne(id);
   }
 
+  async validateUserByToken(token: string) {
+    const tokenPayload = this.jwtService.decode(token) as TokenPayload;
+    if (!tokenPayload) {
+      return null;
+    }
+    return this.usersService.findOne(tokenPayload.userId);
+  }
+
   login(user: User) {
     const payload = { userName: user.name, userId: user.id } as TokenPayload;
     return {

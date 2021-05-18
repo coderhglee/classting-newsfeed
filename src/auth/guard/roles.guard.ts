@@ -5,9 +5,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth.service';
-import { TokenPayload } from '../tokenPayload.interface';
 
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
@@ -16,7 +14,6 @@ export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly jwtService: JwtService,
     private readonly authService: AuthService,
   ) {}
 
@@ -37,11 +34,11 @@ export class RolesGuard implements CanActivate {
       token = token.split(' ').pop();
     }
 
-    const payload = this.jwtService.decode(token) as TokenPayload;
-    if (!payload) {
+    const user = await this.authService.validateUserByToken(token);
+
+    if (!user) {
       return false;
     }
-    const user = await this.authService.validateUserById(payload.userId);
 
     return requiredRoles.some((role) => user.hasRole(role));
   }
