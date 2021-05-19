@@ -98,7 +98,9 @@ describe('SubscriptionService', () => {
     jest
       .spyOn(subscriptionRepository, 'findOneOrFail')
       .mockResolvedValue(mockSubscription);
-    expect(await subscriptionService.findOne(1)).toBe(mockSubscription);
+    expect(await subscriptionService.findOne(1, mockLoginUser)).toBe(
+      mockSubscription,
+    );
   });
 
   it('findOne throw Exception', async () => {
@@ -106,7 +108,7 @@ describe('SubscriptionService', () => {
       .spyOn(subscriptionRepository, 'findOneOrFail')
       .mockRejectedValue(new Error());
     try {
-      expect(await subscriptionService.findOne(1)).toThrow();
+      expect(await subscriptionService.findOne(1, mockLoginUser)).toThrow();
     } catch (error) {
       expect(error.message).toBe('구독 정보를 찾을수 없습니다.');
     }
@@ -119,7 +121,9 @@ describe('SubscriptionService', () => {
     jest
       .spyOn(subscriptionRepository, 'remove')
       .mockResolvedValue(mockSubscription);
-    expect(await subscriptionService.remove(1)).toBe(mockSubscription);
+    expect(await subscriptionService.remove(1, mockLoginUser)).toBe(
+      mockSubscription,
+    );
   });
 
   it('remove throw Exception', async () => {
@@ -128,7 +132,7 @@ describe('SubscriptionService', () => {
       .mockResolvedValue(mockSubscription);
     jest.spyOn(subscriptionRepository, 'remove').mockRejectedValue(new Error());
     try {
-      expect(await subscriptionService.remove(1)).toThrow();
+      expect(await subscriptionService.remove(1, mockLoginUser)).toThrow();
     } catch (error) {
       expect(error.message).toBe('구독을 취소하는데 실패하였습니다.');
     }

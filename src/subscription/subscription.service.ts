@@ -37,15 +37,17 @@ export class SubscriptionService {
       });
   }
 
-  async findOne(id: number) {
-    return this.subscriptionRepository.findOneOrFail(id).catch((error) => {
-      this.logger.error(error);
-      throw new BadRequestException(`구독 정보를 찾을수 없습니다.`);
-    });
+  async findOne(id: number, user: User) {
+    return this.subscriptionRepository
+      .findOneOrFail({ id: id, user: user })
+      .catch((error) => {
+        this.logger.error(error);
+        throw new BadRequestException(`구독 정보를 찾을수 없습니다.`);
+      });
   }
 
-  async remove(id: number) {
-    return this.findOne(id).then(async (subscription) => {
+  async remove(id: number, user: User) {
+    return this.findOne(id, user).then(async (subscription) => {
       return this.subscriptionRepository.remove(subscription).catch((error) => {
         this.logger.error(error);
         throw new BadRequestException(`구독을 취소하는데 실패하였습니다.`);

@@ -28,8 +28,10 @@ export class SubscriptionController {
     return this.subscriptionService.subscribePage(+pageId, targetUser);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  removeSubscribtion(@Param('id') id: string) {
-    return this.subscriptionService.remove(+id);
+  removeSubscribtion(@Request() req, @Param('id') id: string) {
+    const targetUser: User = req.user;
+    return this.subscriptionService.remove(+id, targetUser);
   }
 }
