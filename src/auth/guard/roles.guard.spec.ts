@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
 import { RolesGuard } from './roles.guard';
 
-describe('TestGuard', () => {
+describe('RolesGuard', () => {
   let roleGuard: RolesGuard;
 
   beforeEach(async () => {

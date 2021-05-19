@@ -116,4 +116,17 @@ describe('PostService', () => {
       .mockResolvedValue(new Post(existPostFixture));
     expect(await postService.remove(1)).toEqual(existPostFixture);
   });
+
+  it('소식을 찾을수 없을때 에러를 발생한다.', async () => {
+    jest
+      .spyOn(postService, 'findOne')
+      .mockRejectedValue(Error('not found user'));
+    try {
+      expect(await postService.remove(1)).toThrow();
+    } catch (error) {
+      expect(error.message).toBe(
+        'Post를 삭제하는데 실패 하였습니다. ID: 1 exception: Error: not found user',
+      );
+    }
+  });
 });

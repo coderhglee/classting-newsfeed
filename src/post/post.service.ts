@@ -25,12 +25,14 @@ export class PostService {
     });
   }
 
-  findAll() {
-    return `This action returns all post`;
-  }
-
-  findOneByRelatedPage(id: number) {
-    return this.postRepository.findOneOrFail(id, { relations: ['page'] });
+  async findOneByRelatedPage(id: number) {
+    try {
+      return await this.postRepository.findOneOrFail(id, {
+        relations: ['page'],
+      });
+    } catch (error) {
+      throw new BadRequestException(`Not Found User Cause ${error}`);
+    }
   }
 
   findOne(id: number) {

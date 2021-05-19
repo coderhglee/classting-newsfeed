@@ -21,4 +21,11 @@ export class Page {
   constructor(partial: Partial<Page>) {
     Object.assign(this, partial);
   }
+
+  isPageOwner(id: number) {
+    if (this.ownerId === id) {
+      return true;
+    }
+    return false;
+  }
 }
