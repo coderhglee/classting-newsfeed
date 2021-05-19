@@ -11,18 +11,17 @@ import { PageService } from './../../page/page.service';
 export class UserIsOwnerGuard implements CanActivate {
   constructor(private readonly pageService: PageService) {}
 
-  canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
     const body = request.body;
     const pageId: number = body.pageId as number;
     const user: User = request.user;
 
-    return this.pageService.findById(pageId).then((page) => {
-      if (page.isPageOwner(user.id)) {
-        return true;
-      }
-      throw new UnauthorizedException('해당 Page의 권한이 없습니다.');
-    });
+    const page = await this.pageService.findById(pageId);
+    if (page.isPageOwner(user.id)) {
+      return true;
+    }
+    throw new UnauthorizedException('해당 Page의 권한이 없습니다.');
   }
 }

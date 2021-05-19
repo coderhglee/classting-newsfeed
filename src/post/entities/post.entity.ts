@@ -1,15 +1,9 @@
 import { Page } from '../../page/entities/page.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity } from '../../base/entity/base.entity';
 
 @Entity()
-export class Post {
+export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,16 +13,11 @@ export class Post {
   @Column()
   context: string;
 
-  @CreateDateColumn()
-  create_at: Date;
-
-  @UpdateDateColumn()
-  update_at: Date;
-
   @ManyToOne(() => Page, (page) => page.posts)
   page: Page;
 
   constructor(partial: Partial<Post>) {
+    super();
     Object.assign(this, partial);
   }
 }

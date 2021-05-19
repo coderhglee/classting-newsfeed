@@ -10,6 +10,8 @@ import { User } from './user/entities/user.entity';
 import { Page } from './page/entities/page.entity';
 import { PostModule } from './post/post.module';
 import { Post } from './post/entities/post.entity';
+import { Subscription } from './subscription/entities/subscription.entity';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { Post } from './post/entities/post.entity';
       // username: 'root',
       // password: 'root',
       database: 'feed-db',
-      entities: [User, Page, Post],
+      entities: [User, Page, Post, Subscription],
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
       keepConnectionAlive: true,
@@ -32,6 +34,7 @@ import { Post } from './post/entities/post.entity';
     AuthModule,
     PageModule,
     PostModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
