@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
+import { PublishService } from 'src/publish/publish.service';
 
 @Injectable()
 export class PostService {
@@ -14,15 +15,18 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly pageService: PageService,
+    private readonly publishService: PublishService,
   ) {}
-  create(createPostDto: CreatePostDto) {
-    return this.pageService.findById(createPostDto.pageId).then((page) => {
-      const newPost = this.postRepository.create({
-        ...createPostDto,
-        page: page,
-      });
-      return this.postRepository.save(newPost);
+
+  async create(createPostDto: CreatePostDto) {
+    const page = await this.pageService.findById(createPostDto.pageId);
+    const newPost = this.postRepository.create({
+      ...createPostDto,
+      page: page,
     });
+    const savedPost = await this.postRepository.save(newPost);
+    this.publishService.sendPost(page, savedPost.id);
+    return savedPost;
   }
 
   async findOneByRelatedPage(id: number) {
@@ -39,27 +43,25 @@ export class PostService {
     return this.postRepository.findOneOrFail(id);
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return this.findOne(id)
-      .then((post) => {
-        return this.postRepository.save({ post, ...updatePostDto });
-      })
-      .catch((err) => {
-        const message = `Post를 업데이트하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
-        this.logger.error(message);
-        throw new BadRequestException(message);
-      });
+  async update(id: number, updatePostDto: UpdatePostDto) {
+    try {
+      const post = await this.findOne(id);
+      return await this.postRepository.save({ post, ...updatePostDto });
+    } catch (err) {
+      const message = `Post를 업데이트하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
+      this.logger.error(message);
+      throw new BadRequestException(message);
+    }
   }
 
-  remove(id: number) {
-    return this.findOne(id)
-      .then((post) => {
-        return this.postRepository.remove(post);
-      })
-      .catch((err) => {
-        const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
-        this.logger.error(message);
-        throw new BadRequestException(message);
-      });
+  async remove(id: number) {
+    try {
+      const post = await this.findOne(id);
+      return await this.postRepository.remove(post);
+    } catch (err) {
+      const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
+      this.logger.error(message);
+      throw new BadRequestException(message);
+    }
   }
 }

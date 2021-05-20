@@ -9,5 +9,6 @@ import { PageModule } from '../page/page.module';
   imports: [TypeOrmModule.forFeature([Subscription]), PageModule],
   controllers: [SubscriptionController],
   providers: [SubscriptionService],
+  exports: [SubscriptionService],
 })
 export class SubscriptionModule {}

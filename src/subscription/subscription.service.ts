@@ -4,6 +4,7 @@ import { PageService } from '../page/page.service';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
+import { Page } from '../page/entities/page.entity';
 
 @Injectable()
 export class SubscriptionService {
@@ -34,6 +35,15 @@ export class SubscriptionService {
       .catch((error) => {
         this.logger.error(error);
         throw new BadRequestException(`구독중인 페이지를 찾을수 없습니다.`);
+      });
+  }
+
+  async findAllUserBySubscribePage(page: Page) {
+    return this.subscriptionRepository
+      .find({ where: { page: page }, relations: ['user', 'page'] })
+      .catch((error) => {
+        this.logger.error(error);
+        throw new BadRequestException(`페이지 유저 정보를 찾을수 없습니다.`);
       });
   }
 

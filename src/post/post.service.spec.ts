@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { PageService } from './../page/page.service';
 import { Post } from './entities/post.entity';
 import { PostService } from './post.service';
+import { PublishService } from 'src/publish/publish.service';
 
 describe('PostService', () => {
   let postService: PostService;
@@ -37,16 +38,18 @@ describe('PostService', () => {
             remove: jest.fn(),
           },
         },
+        {
+          provide: PublishService,
+          useValue: {
+            sendPost: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     postService = module.get<PostService>(PostService);
     pageService = module.get<PageService>(PageService);
     postRepository = module.get<Repository<Post>>(getRepositoryToken(Post));
-
-    jest
-      .spyOn(postService, 'findOne')
-      .mockResolvedValue(new Post(existPostFixture));
   });
 
   it('should be defined', () => {
@@ -87,6 +90,10 @@ describe('PostService', () => {
       .spyOn(postRepository, 'save')
       .mockResolvedValue(new Post(resultFixture));
 
+    jest
+      .spyOn(postService, 'findOne')
+      .mockResolvedValue(new Post(existPostFixture));
+
     expect(postService.update(1, updatePostFixture)).resolves.toEqual(
       new Post(resultFixture),
     );
@@ -113,6 +120,10 @@ describe('PostService', () => {
   it('페이지 소식 삭제 할수 있다.', async () => {
     jest
       .spyOn(postRepository, 'remove')
+      .mockResolvedValue(new Post(existPostFixture));
+
+    jest
+      .spyOn(postService, 'findOne')
       .mockResolvedValue(new Post(existPostFixture));
     expect(await postService.remove(1)).toEqual(existPostFixture);
   });

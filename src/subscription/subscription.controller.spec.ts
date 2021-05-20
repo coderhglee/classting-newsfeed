@@ -68,6 +68,8 @@ describe('SubscriptionController', () => {
   it('should be defined', async () => {
     const subFixture = new Subscription({});
     jest.spyOn(service, 'remove').mockResolvedValue(subFixture);
-    expect(await controller.removeSubscribtion('1')).toBe(subFixture);
+    expect(await controller.removeSubscribtion(loginUserRequest, '1')).toBe(
+      subFixture,
+    );
   });
 });
