@@ -7,6 +7,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { PublishModule } from './publish/publish.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { FeedModule } from './feed/feed.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     SubscriptionModule,
     PublishModule,
     DatabaseModule,
+    FeedModule,
   ],
   controllers: [],
   providers: [],

@@ -32,6 +32,6 @@ import { PublishService } from './publish.service';
     },
     PublishEventStore,
   ],
-  exports: [PublishService],
+  exports: [PublishService, PublishEventStore],
 })
 export class PublishModule {}
