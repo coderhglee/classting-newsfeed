@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PostService } from 'src/post/post.service';
 import { PublishEventStore } from 'src/publish/infra/publish-event-store';
-import { SubscriptionService } from 'src/subscription/subscription.service';
 import { FeedService } from './feed.service';
 
 describe('FeedService', () => {
@@ -11,7 +11,7 @@ describe('FeedService', () => {
       providers: [
         FeedService,
         { provide: PublishEventStore, useValue: {} },
-        { provide: SubscriptionService, useValue: {} },
+        { provide: PostService, useValue: {} },
       ],
     }).compile();
 
