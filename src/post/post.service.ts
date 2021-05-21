@@ -25,7 +25,7 @@ export class PostService {
       page: page,
     });
     const savedPost = await this.postRepository.save(newPost);
-    this.publishService.sendPost(page, savedPost.id);
+    this.publishService.publishPost(page, savedPost.id);
     return savedPost;
   }
 

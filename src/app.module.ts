@@ -6,9 +6,11 @@ import { PostModule } from './post/post.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { PublishModule } from './publish/publish.module';
 import { DatabaseModule } from './database/database.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     UserModule,
     AuthModule,
     PageModule,

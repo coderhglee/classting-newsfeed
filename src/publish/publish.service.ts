@@ -11,15 +11,14 @@ export class PublishService {
     private readonly eventStore: PublishEventStore,
   ) {}
 
-  async sendPost(page: Page, postId: number) {
+  async publishPost(page: Page, postId: number) {
     await this.subscriptionService
       .findAllUserBySubscribePage(page)
       .then((subscriptions) => {
         subscriptions.forEach((element) => {
-          console.log(element);
-          this.eventStore.publishPost({
+          this.eventStore.publishEvent({
             key: element.user.id + '',
-            value: [postId + ''],
+            value: postId + '',
           });
         });
       });

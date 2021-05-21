@@ -10,6 +10,7 @@ import { PublishService } from 'src/publish/publish.service';
 describe('PostService', () => {
   let postService: PostService;
   let pageService: PageService;
+  let publishService: PublishService;
   let postRepository: Repository<Post>;
 
   const existPostFixture = {
@@ -41,7 +42,7 @@ describe('PostService', () => {
         {
           provide: PublishService,
           useValue: {
-            sendPost: jest.fn(),
+            publishPost: jest.fn(),
           },
         },
       ],
@@ -49,6 +50,7 @@ describe('PostService', () => {
 
     postService = module.get<PostService>(PostService);
     pageService = module.get<PageService>(PageService);
+    publishService = module.get<PublishService>(PublishService);
     postRepository = module.get<Repository<Post>>(getRepositoryToken(Post));
   });
 
@@ -74,6 +76,7 @@ describe('PostService', () => {
     };
     jest.spyOn(pageService, 'findById').mockResolvedValue(pageFixture);
     jest.spyOn(postRepository, 'save').mockResolvedValue(new Post(fixture));
+    jest.spyOn(publishService, 'publishPost').mockReturnThis();
     expect(await postService.create(dtoFixtgure)).toEqual(fixture);
   });
 
