@@ -7,7 +7,7 @@ export class Page {
   id: number;
 
   @Column()
-  ownerId: number;
+  ownerId: string;
 
   @Column()
   name: string;
@@ -22,7 +22,7 @@ export class Page {
     Object.assign(this, partial);
   }
 
-  isPageOwner(id: number) {
+  isPageOwner(id: string) {
     if (this.ownerId === id) {
       return true;
     }

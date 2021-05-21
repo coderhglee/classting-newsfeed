@@ -47,7 +47,7 @@ describe('PageController', () => {
   it('should be defined', async () => {
     const loginUserRequest = {
       user: {
-        id: 2,
+        id: 'id',
         name: 'admin',
       },
     };

@@ -19,7 +19,7 @@ export class AuthService {
     return null;
   }
 
-  async validateUserById(id: number) {
+  async validateUserById(id: string) {
     return this.usersService.findOne(id);
   }
 

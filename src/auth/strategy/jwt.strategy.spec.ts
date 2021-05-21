@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
 import { JwtStrategy } from './jwt.strategy';
-import { jwtConstants } from './../constants';
 import { User } from './../../user/entities/user.entity';
-import { HttpException, UnauthorizedException } from '@nestjs/common';
-import { exception } from 'console';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
@@ -33,11 +30,11 @@ describe('JwtStrategy', () => {
 
   it('should validate', async () => {
     const payload = {
-      userId: 1,
+      userId: '1',
       userName: 'test',
     };
     const userFixture = new User({
-      id: 1,
+      id: '1',
       name: 'hglee',
     });
     jest.spyOn(authService, 'validateUserById').mockResolvedValue(userFixture);
@@ -46,7 +43,7 @@ describe('JwtStrategy', () => {
 
   it('should validate throw exception', async () => {
     const payload = {
-      userId: 1,
+      userId: '1',
       userName: 'test',
     };
     jest.spyOn(authService, 'validateUserById').mockResolvedValue(undefined);

@@ -21,8 +21,7 @@ export class PageController {
   @UseGuards(JwtAuthGuard)
   @Roles('admin')
   create(@Request() req, @Body() createPageDto: CreatePageDto) {
-    const loginUser = req.user.id;
-    return this.pageService.create(loginUser, createPageDto);
+    return this.pageService.create(req.user, createPageDto);
   }
 
   @Get(':id')

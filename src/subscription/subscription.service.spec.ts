@@ -6,7 +6,6 @@ import { PageService } from '../page/page.service';
 import { Subscription } from './entities/subscription.entity';
 import { SubscriptionService } from './subscription.service';
 import { User } from '../user/entities/user.entity';
-import { BadRequestException } from '@nestjs/common';
 
 describe('SubscriptionService', () => {
   let subscriptionService: SubscriptionService;
@@ -14,7 +13,7 @@ describe('SubscriptionService', () => {
   let subscriptionRepository: Repository<Subscription>;
 
   const mockLoginUser = new User({
-    id: 1,
+    id: '1',
   });
 
   const mockPage = new Page({

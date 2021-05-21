@@ -17,7 +17,7 @@ export class PublishService {
       .then((subscriptions) => {
         subscriptions.forEach((element) => {
           this.eventStore.publishEvent({
-            key: element.user.id + '',
+            key: element.user.id,
             value: postId + '',
           });
         });

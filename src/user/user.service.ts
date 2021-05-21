@@ -23,7 +23,7 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       return await this.userRepository.findOneOrFail(id);
     } catch (error) {
@@ -40,7 +40,7 @@ export class UserService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: string, updateUserDto: UpdateUserDto) {
     return this.findOne(id)
       .then((user) => {
         const updateUser = { ...user, ...updateUserDto };
@@ -52,7 +52,7 @@ export class UserService {
       });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.findOne(id)
       .then((user) => {
         return this.userRepository.remove(user);

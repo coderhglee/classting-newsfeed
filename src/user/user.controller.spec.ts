@@ -4,21 +4,21 @@ import { UserService } from './user.service';
 
 const multiUserFixture = [
   {
-    id: 1,
+    id: '1',
     name: 'user_1',
   },
   {
-    id: 2,
+    id: '2',
     name: 'user_2',
   },
   {
-    id: 3,
+    id: '3',
     name: 'user_3',
   },
 ];
 
 const singleUserFixture = {
-  id: 1,
+  id: '1',
   name: 'user_1',
 };
 
@@ -87,7 +87,7 @@ describe('UserController', () => {
     const dto = { name: 'hglee' };
 
     expect(controller.update('1', dto)).toEqual({
-      id: 1,
+      id: '1',
       ...dto,
     });
 
