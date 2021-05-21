@@ -13,9 +13,7 @@ describe('RolesGuard', () => {
         Reflector,
         {
           provide: AuthService,
-          useValue: {
-            // decode: jest.fn(),
-          },
+          useValue: {},
         },
       ],
     }).compile();

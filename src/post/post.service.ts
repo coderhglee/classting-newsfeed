@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageService } from '../page/page.service';
 import { Repository } from 'typeorm';
@@ -24,44 +29,51 @@ export class PostService {
       ...createPostDto,
       page: page,
     });
-    const savedPost = await this.postRepository.save(newPost);
-    this.publishService.publishPost(page, savedPost.id);
-    return savedPost;
+    return this.postRepository
+      .save(newPost)
+      .then((savedPost) => {
+        this.publishService.publishPost(page, savedPost.id);
+        return savedPost;
+      })
+      .catch(() => {
+        throw new BadRequestException(`Post를 생성하는데 실패하였습니다.`);
+      });
   }
 
   async findOneByRelatedPage(id: number) {
-    try {
-      return await this.postRepository.findOneOrFail(id, {
-        relations: ['page'],
-      });
-    } catch (error) {
-      throw new BadRequestException(`Not Found User Cause ${error}`);
+    const postById = await this.postRepository.findOne(id, {
+      relations: ['page'],
+    });
+    if (!postById) {
+      throw new NotFoundException(`Post를 찾는데 실패하였습니다 ID: ${id}`);
     }
   }
 
-  findOne(id: number) {
-    return this.postRepository.findOneOrFail(id);
+  async findOne(id: number) {
+    const postById = await this.postRepository.findOne(id);
+    if (!postById) {
+      throw new NotFoundException(`Post를 찾는데 실패하였습니다 ID: ${id}`);
+    }
+    return postById;
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
-    try {
-      const post = await this.findOne(id);
-      return await this.postRepository.save({ post, ...updatePostDto });
-    } catch (err) {
-      const message = `Post를 업데이트하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
-      this.logger.error(message);
-      throw new BadRequestException(message);
-    }
+    const postById = await this.findOne(id);
+    return this.postRepository
+      .save({ post: postById, ...updatePostDto })
+      .catch((err) => {
+        const message = `Post를 업데이트하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
+        this.logger.error(message);
+        throw new BadRequestException(message);
+      });
   }
 
   async remove(id: number) {
-    try {
-      const post = await this.findOne(id);
-      return await this.postRepository.remove(post);
-    } catch (err) {
+    const postById = await this.findOne(id);
+    return this.postRepository.remove(postById).catch((err) => {
       const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
       this.logger.error(message);
       throw new BadRequestException(message);
-    }
+    });
   }
 }

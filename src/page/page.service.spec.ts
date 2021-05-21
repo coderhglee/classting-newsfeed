@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Page } from './entities/page.entity';
 import { PageService } from './page.service';
@@ -32,13 +33,14 @@ describe('PageService', () => {
 
   it('페이지를 생성할 수 있다.', async () => {
     const pageFixture = new Page({
-      ownerId: 1,
+      ownerId: '1',
       name: 'TEST_SCHOOL',
       region: 'seoul',
     });
+    const userFixture = new User({ id: '1' });
     jest.spyOn(repo, 'create').mockReturnValue(pageFixture);
     jest.spyOn(repo, 'save').mockResolvedValue(pageFixture);
-    expect(await service.create(1, pageFixture)).toBe(pageFixture);
+    expect(await service.create(userFixture, pageFixture)).toBe(pageFixture);
     expect(repo.create).toHaveBeenCalledTimes(1);
     expect(repo.save).toHaveBeenCalledTimes(1);
   });

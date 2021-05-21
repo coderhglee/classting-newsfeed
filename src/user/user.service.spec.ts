@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 const multiUserFixture = [
   new User({ name: 'user_1', password: 'password', roles: ['admin', 'user'] }),
@@ -19,7 +19,7 @@ const singleUserFixture = new User({
 
 const mockUserRepository = {
   find: jest.fn().mockResolvedValue(multiUserFixture),
-  findOneOrFail: jest.fn().mockResolvedValue(singleUserFixture),
+  findOne: jest.fn().mockResolvedValue(singleUserFixture),
   create: jest.fn().mockReturnValue(singleUserFixture),
   save: jest.fn().mockResolvedValue(singleUserFixture),
   update: jest.fn(),
@@ -58,15 +58,13 @@ describe('UserService', () => {
 
   describe('findOne', () => {
     it('should get a single user', async () => {
-      await expect(service.findOne(1)).resolves.toEqual(singleUserFixture);
+      await expect(service.findOne('uuid')).resolves.toEqual(singleUserFixture);
     });
 
     it('should throw with message if not found user when find user', async () => {
-      jest
-        .spyOn(repo, 'findOneOrFail')
-        .mockRejectedValueOnce(new Error('Bad Delete Method.'));
-      await expect(service.findOne(1)).rejects.toThrowError(
-        'Not Found User Cause Error: Bad Delete Method.',
+      jest.spyOn(repo, 'findOne').mockResolvedValue(undefined);
+      await expect(service.findOne('uuid')).rejects.toThrowError(
+        NotFoundException,
       );
     });
   });
@@ -89,7 +87,7 @@ describe('UserService', () => {
       });
       jest.spyOn(service, 'findOne').mockResolvedValue(singleUserFixture);
       jest.spyOn(repo, 'save').mockResolvedValue(updateUser);
-      expect(await service.update(1, { name: updateUser.name })).toEqual(
+      expect(await service.update('uuid', { name: updateUser.name })).toEqual(
         updateUser,
       );
       expect(service.findOne).toHaveBeenCalled();
@@ -101,7 +99,7 @@ describe('UserService', () => {
         .spyOn(service, 'findOne')
         .mockRejectedValueOnce(new BadRequestException('Not Found User'));
       await expect(
-        service.update(1, { name: 'hglee_update' }),
+        service.update('uuid', { name: 'hglee_update' }),
       ).rejects.toThrowError('Not Found User');
       expect(service.findOne).toHaveBeenCalledTimes(1);
     });
@@ -112,7 +110,7 @@ describe('UserService', () => {
       jest
         .spyOn(service, 'findOne')
         .mockRejectedValueOnce(new BadRequestException('Not Found User'));
-      await expect(service.remove(1)).rejects.toThrow('Not Found User');
+      await expect(service.remove('uuid')).rejects.toThrow('Not Found User');
     });
   });
 });

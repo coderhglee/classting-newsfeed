@@ -6,6 +6,7 @@ import { PageService } from './../page/page.service';
 import { Post } from './entities/post.entity';
 import { PostService } from './post.service';
 import { PublishService } from 'src/publish/publish.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('PostService', () => {
   let postService: PostService;
@@ -37,6 +38,7 @@ describe('PostService', () => {
             create: jest.fn(),
             save: jest.fn(),
             remove: jest.fn(),
+            findOne: jest.fn(),
           },
         },
         {
@@ -61,7 +63,7 @@ describe('PostService', () => {
   it('페이지의 소식을 생성할 수 있다.', async () => {
     const pageFixture = new Page({
       id: 1,
-      ownerId: 1,
+      ownerId: '1',
       name: 'admin',
       region: 'seoul',
     });
@@ -78,6 +80,13 @@ describe('PostService', () => {
     jest.spyOn(postRepository, 'save').mockResolvedValue(new Post(fixture));
     jest.spyOn(publishService, 'publishPost').mockReturnThis();
     expect(await postService.create(dtoFixtgure)).toEqual(fixture);
+  });
+
+  it('소식을 찾을수 없을때 에러를 발생한다.', async () => {
+    jest.spyOn(postRepository, 'findOne').mockReturnValue(undefined);
+    await expect(postService.findOne(1)).rejects.toThrowError(
+      NotFoundException,
+    );
   });
 
   it('페이지의 소식을 수정할 수 있다.', () => {
@@ -102,24 +111,6 @@ describe('PostService', () => {
     );
   });
 
-  it('소식을 찾을수 없을때 에러를 발생한다.', async () => {
-    jest
-      .spyOn(postService, 'findOne')
-      .mockRejectedValue(Error('not found user'));
-    try {
-      expect(
-        await postService.update(1, {
-          title: 'post title_update',
-          context: 'post context_update',
-        }),
-      ).toThrow();
-    } catch (error) {
-      expect(error.message).toBe(
-        'Post를 업데이트하는데 실패 하였습니다. ID: 1 exception: Error: not found user',
-      );
-    }
-  });
-
   it('페이지 소식 삭제 할수 있다.', async () => {
     jest
       .spyOn(postRepository, 'remove')
@@ -129,18 +120,5 @@ describe('PostService', () => {
       .spyOn(postService, 'findOne')
       .mockResolvedValue(new Post(existPostFixture));
     expect(await postService.remove(1)).toEqual(existPostFixture);
-  });
-
-  it('소식을 찾을수 없을때 에러를 발생한다.', async () => {
-    jest
-      .spyOn(postService, 'findOne')
-      .mockRejectedValue(Error('not found user'));
-    try {
-      expect(await postService.remove(1)).toThrow();
-    } catch (error) {
-      expect(error.message).toBe(
-        'Post를 삭제하는데 실패 하였습니다. ID: 1 exception: Error: not found user',
-      );
-    }
   });
 });

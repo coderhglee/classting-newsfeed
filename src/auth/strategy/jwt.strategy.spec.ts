@@ -43,7 +43,7 @@ describe('JwtStrategy', () => {
 
   it('should validate throw exception', async () => {
     const payload = {
-      userId: '1',
+      userId: 'uuid',
       userName: 'test',
     };
     jest.spyOn(authService, 'validateUserById').mockResolvedValue(undefined);

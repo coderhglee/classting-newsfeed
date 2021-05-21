@@ -6,6 +6,7 @@ import { PageService } from '../page/page.service';
 import { Subscription } from './entities/subscription.entity';
 import { SubscriptionService } from './subscription.service';
 import { User } from '../user/entities/user.entity';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('SubscriptionService', () => {
   let subscriptionService: SubscriptionService;
@@ -31,20 +32,16 @@ describe('SubscriptionService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionService,
-        PageService,
+        { provide: PageService, useValue: { findById: jest.fn() } },
         {
           provide: getRepositoryToken(Subscription),
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn,
-            findOneOrFail: jest.fn(),
+            findOne: jest.fn(),
             remove: jest.fn(),
           },
-        },
-        {
-          provide: getRepositoryToken(Page),
-          useValue: {},
         },
       ],
     }).compile();
@@ -84,18 +81,14 @@ describe('SubscriptionService', () => {
 
   it('findAllSubscribePage throw Exception', async () => {
     jest.spyOn(subscriptionRepository, 'find').mockRejectedValue(new Error());
-    try {
-      expect(
-        await subscriptionService.findAllSubscribePage(mockLoginUser),
-      ).toThrow();
-    } catch (error) {
-      expect(error.message).toBe('구독중인 페이지를 찾을수 없습니다.');
-    }
+    await expect(
+      subscriptionService.findAllSubscribePage(mockLoginUser),
+    ).rejects.toThrowError(Error);
   });
 
   it('findOne', async () => {
     jest
-      .spyOn(subscriptionRepository, 'findOneOrFail')
+      .spyOn(subscriptionRepository, 'findOne')
       .mockResolvedValue(mockSubscription);
     expect(await subscriptionService.findOne(1, mockLoginUser)).toBe(
       mockSubscription,
@@ -103,14 +96,11 @@ describe('SubscriptionService', () => {
   });
 
   it('findOne throw Exception', async () => {
-    jest
-      .spyOn(subscriptionRepository, 'findOneOrFail')
-      .mockRejectedValue(new Error());
-    try {
-      expect(await subscriptionService.findOne(1, mockLoginUser)).toThrow();
-    } catch (error) {
-      expect(error.message).toBe('구독 정보를 찾을수 없습니다.');
-    }
+    jest.spyOn(subscriptionRepository, 'findOne').mockReturnValue(undefined);
+
+    await expect(
+      subscriptionService.findOne(1, mockLoginUser),
+    ).rejects.toThrowError(NotFoundException);
   });
 
   it('remove', async () => {
@@ -130,10 +120,8 @@ describe('SubscriptionService', () => {
       .spyOn(subscriptionService, 'findOne')
       .mockResolvedValue(mockSubscription);
     jest.spyOn(subscriptionRepository, 'remove').mockRejectedValue(new Error());
-    try {
-      expect(await subscriptionService.remove(1, mockLoginUser)).toThrow();
-    } catch (error) {
-      expect(error.message).toBe('구독을 취소하는데 실패하였습니다.');
-    }
+    await expect(
+      subscriptionService.remove(1, mockLoginUser),
+    ).rejects.toThrowError(BadRequestException);
   });
 });

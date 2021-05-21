@@ -18,6 +18,7 @@ describe('AuthService', () => {
           provide: UserService,
           useValue: {
             findByName: jest.fn(),
+            findOne: jest.fn(),
           },
         },
         {
@@ -25,10 +26,6 @@ describe('AuthService', () => {
           useValue: {
             sign: jest.fn(),
           },
-        },
-        {
-          provide: getRepositoryToken(User),
-          useValue: {},
         },
       ],
     }).compile();

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -24,23 +29,23 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    try {
-      return await this.userRepository.findOneOrFail(id);
-    } catch (error) {
-      throw new BadRequestException(`Not Found User Cause ${error}`);
+    const userById = await this.userRepository.findOne(id);
+    if (!userById) {
+      throw new NotFoundException(`사용자를 찾을수 없습니다. Name: ${id}`);
     }
+    return userById;
   }
 
   async findByName(name: string) {
     const user = await this.userRepository.findOne({ name });
     if (!user) {
-      throw new BadRequestException(`사용자를 찾을수 없습니다. Name: ${name}`);
+      throw new NotFoundException(`사용자를 찾을수 없습니다. Name: ${name}`);
     }
 
     return user;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return this.findOne(id)
       .then((user) => {
         const updateUser = { ...user, ...updateUserDto };
@@ -52,7 +57,7 @@ export class UserService {
       });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     return this.findOne(id)
       .then((user) => {
         return this.userRepository.remove(user);

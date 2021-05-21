@@ -21,12 +21,10 @@ export class PageService {
   }
 
   async findById(id: number) {
-    try {
-      return await this.pageRepository.findOneOrFail(id);
-    } catch (error) {
-      throw new BadRequestException(
-        `페이지를 찾을수 없습니다. ID ${id} error ${error}`,
-      );
+    const pageById = await this.pageRepository.findOne(id);
+    if (!pageById) {
+      throw new BadRequestException(`페이지를 찾을수 없습니다. ID ${id}`);
     }
+    return pageById;
   }
 }

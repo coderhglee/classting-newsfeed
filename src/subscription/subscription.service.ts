@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageService } from '../page/page.service';
 import { User } from '../user/entities/user.entity';
@@ -34,7 +39,7 @@ export class SubscriptionService {
       .find({ where: { user: user }, relations: ['page'] })
       .catch((error) => {
         this.logger.error(error);
-        throw new BadRequestException(`구독중인 페이지를 찾을수 없습니다.`);
+        throw new NotFoundException(`구독중인 페이지를 찾을수 없습니다.`);
       });
   }
 
@@ -43,17 +48,19 @@ export class SubscriptionService {
       .find({ where: { page: page }, relations: ['user', 'page'] })
       .catch((error) => {
         this.logger.error(error);
-        throw new BadRequestException(`페이지 유저 정보를 찾을수 없습니다.`);
+        throw new NotFoundException(`구독 페이지 유저 정보를 찾을수 없습니다.`);
       });
   }
 
   async findOne(id: number, user: User) {
-    return this.subscriptionRepository
-      .findOneOrFail({ id: id, user: user })
-      .catch((error) => {
-        this.logger.error(error);
-        throw new BadRequestException(`구독 정보를 찾을수 없습니다.`);
-      });
+    const subscriptionById = this.subscriptionRepository.findOne({
+      id: id,
+      user: user,
+    });
+    if (!subscriptionById) {
+      throw new NotFoundException(`구독 정보를 찾을수 없습니다.`);
+    }
+    return subscriptionById;
   }
 
   async remove(id: number, user: User) {

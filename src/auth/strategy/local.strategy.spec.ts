@@ -30,7 +30,7 @@ describe('LocalStrategy', () => {
 
   it('should validate', async () => {
     const userFixture = new User({
-      id: 1,
+      id: 'uuid',
       name: 'hglee',
     });
     jest.spyOn(authService, 'validateUser').mockResolvedValue(userFixture);

@@ -10,5 +10,6 @@ import { PublishModule } from '../publish/publish.module';
   imports: [TypeOrmModule.forFeature([Post]), PageModule, PublishModule],
   controllers: [PostController],
   providers: [PostService],
+  exports: [PostService],
 })
 export class PostModule {}
