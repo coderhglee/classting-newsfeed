@@ -23,7 +23,7 @@ const mockUserRepository = {
   create: jest.fn().mockReturnValue(singleUserFixture),
   save: jest.fn().mockResolvedValue(singleUserFixture),
   update: jest.fn(),
-  delete: jest.fn(),
+  softRemove: jest.fn(),
 };
 
 describe('UserService', () => {
@@ -111,7 +111,7 @@ describe('UserService', () => {
 
   describe('remove', () => {
     it('사용자를 삭제하는데 실패하면 에러를 반환한다', async () => {
-      jest.spyOn(repo, 'remove').mockRejectedValue(Error);
+      jest.spyOn(repo, 'softRemove').mockRejectedValue(Error);
       await expect(service.remove('uuid')).rejects.toThrow(BadRequestException);
     });
   });

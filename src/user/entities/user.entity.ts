@@ -1,11 +1,12 @@
 import { Exclude } from 'class-transformer';
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { BaseEntity } from 'src/base/entity/base.entity';
 
 export const USER_ENTITY = 'user';
 
 @Entity(USER_ENTITY)
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -35,6 +36,7 @@ export class User {
   }
 
   constructor(partial: Partial<User>) {
+    super();
     Object.assign(this, partial);
   }
 }

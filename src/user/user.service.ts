@@ -64,7 +64,7 @@ export class UserService {
   async remove(id: string) {
     return this.findOne(id)
       .then((user) => {
-        return this.userRepository.remove(user);
+        return this.userRepository.softRemove(user);
       })
       .catch((err) => {
         this.logger.error(`User Remove Error cause ${err}`);
