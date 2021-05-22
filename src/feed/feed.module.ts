@@ -3,7 +3,7 @@ import { FeedService } from './feed.service';
 import { FeedController } from './feed.controller';
 import { PublishModule } from 'src/publish/publish.module';
 import { PostModule } from 'src/post/post.module';
-import { RedisModule } from 'src/redis/redis.module';
+import { RedisModule } from 'src/database/redis.module';
 
 @Module({
   imports: [PublishModule, PostModule, RedisModule],
