@@ -47,6 +47,7 @@ export class PostService {
     if (!postById) {
       throw new NotFoundException(`Post를 찾는데 실패하였습니다 ID: ${id}`);
     }
+    return postById;
   }
 
   async findOne(id: number) {
@@ -69,11 +70,17 @@ export class PostService {
   }
 
   async remove(id: number) {
-    const postById = await this.findOne(id);
-    return this.postRepository.remove(postById).catch((err) => {
-      const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
-      this.logger.error(message);
-      throw new BadRequestException(message);
-    });
+    const postById = await this.findOneByRelatedPage(id);
+    return this.postRepository
+      .softRemove(postById)
+      .then(async (removedPost) => {
+        await this.publishService.removePublishedPost(removedPost);
+        return removedPost;
+      })
+      .catch((err) => {
+        const message = `Post를 삭제하는데 실패 하였습니다. ID: ${id} exception: ${err}`;
+        this.logger.error(message);
+        throw new BadRequestException(message);
+      });
   }
 }

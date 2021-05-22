@@ -18,8 +18,9 @@ describe('PostService', () => {
     title: 'post title',
     context: 'post context',
     pageId: 1,
-    create_at: expect.any(Date),
-    update_at: expect.any(Date),
+    createAt: expect.any(Date),
+    updateAt: expect.any(Date),
+    deleteAt: expect.any(Date),
   };
 
   beforeEach(async () => {
@@ -37,7 +38,7 @@ describe('PostService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
-            remove: jest.fn(),
+            softRemove: jest.fn(),
             findOne: jest.fn(),
           },
         },
@@ -45,6 +46,7 @@ describe('PostService', () => {
           provide: PublishService,
           useValue: {
             publishPost: jest.fn(),
+            removePublishedPost: jest.fn(),
           },
         },
       ],
@@ -113,11 +115,11 @@ describe('PostService', () => {
 
   it('페이지 소식 삭제 할수 있다.', async () => {
     jest
-      .spyOn(postRepository, 'remove')
+      .spyOn(postRepository, 'softRemove')
       .mockResolvedValue(new Post(existPostFixture));
 
     jest
-      .spyOn(postService, 'findOne')
+      .spyOn(postService, 'findOneByRelatedPage')
       .mockResolvedValue(new Post(existPostFixture));
     expect(await postService.remove(1)).toEqual(existPostFixture);
   });

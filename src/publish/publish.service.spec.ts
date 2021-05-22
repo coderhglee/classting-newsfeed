@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Page } from 'src/page/entities/page.entity';
 import { PageService } from 'src/page/page.service';
+import { Post } from 'src/post/entities/post.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { User } from 'src/user/entities/user.entity';
@@ -30,12 +31,14 @@ describe('PublishService', () => {
           provide: SubscriptionService,
           useValue: {
             findAllUserBySubscribePage: jest.fn(),
+            findAllFromPostCreatedDate: jest.fn(),
           },
         },
         {
           provide: PublishEventStore,
           useValue: {
             publishEvent: jest.fn(),
+            removePublishdEvent: jest.fn(),
           },
         },
       ],
@@ -51,7 +54,7 @@ describe('PublishService', () => {
   });
 
   it('should publish post event', async () => {
-    const userFixture = new User({ id: 1 });
+    const userFixture = new User({ id: 'uuid' });
     const pageFixture = new Page({ id: 1 });
     const subFixture = new Subscription({
       user: userFixture,
@@ -64,5 +67,30 @@ describe('PublishService', () => {
     await service.publishPost(pageFixture, 1);
     expect(findSubPage).toHaveBeenCalledTimes(1);
     expect(mockPublishEvent).toHaveBeenCalledTimes(2);
+  });
+
+  it('should remove published post event', async () => {
+    const postFixture = new Post({
+      title: expect.any(String),
+      context: expect.any(String),
+      id: expect.any(Number),
+      page: expect.any(Page),
+    });
+    const mockRemovePublishdEvent = jest.spyOn(
+      eventStore,
+      'removePublishdEvent',
+    );
+    const subscriptionFixture = new Subscription({
+      user: expect.any(User),
+      page: expect.any(Page),
+    });
+
+    const mockFindAllFromPostCreatedDate = jest
+      .spyOn(subscriptionService, 'findAllFromPostCreatedDate')
+      .mockResolvedValue([subscriptionFixture, subscriptionFixture]);
+
+    await service.removePublishedPost(postFixture);
+    expect(mockFindAllFromPostCreatedDate).toHaveBeenCalledTimes(1);
+    expect(mockRemovePublishdEvent).toHaveBeenCalledTimes(2);
   });
 });

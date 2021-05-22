@@ -3,7 +3,6 @@ import { RedisClient } from 'redis';
 import { promisify } from 'util';
 import { Inject } from '@nestjs/common';
 import { REDIS_CLIENT } from './publish-event.constants';
-import { PublishSearch } from '../domain/publish-search';
 import { User } from 'src/user/entities/user.entity';
 
 export class PublishEventStore {
@@ -27,11 +26,15 @@ export class PublishEventStore {
     user?: User,
   ): Promise<string[]> {
     const lrange = promisify(this.client.lrange).bind(this.client);
-    console.log(offset + limit);
     return lrange(user.id, offset, offset + limit)
       .then((posts) => {
         return posts;
       })
       .catch(console.error);
+  }
+
+  removePublishdEvent(targetEvent: PublishEvent) {
+    const lrem = promisify(this.client.lrem).bind(this.client);
+    lrem(targetEvent.key, 0, targetEvent.value);
   }
 }

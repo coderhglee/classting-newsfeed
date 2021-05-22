@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageService } from '../page/page.service';
 import { User } from '../user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { Page } from '../page/entities/page.entity';
 
@@ -61,6 +61,16 @@ export class SubscriptionService {
       throw new NotFoundException(`구독 정보를 찾을수 없습니다.`);
     }
     return subscriptionById;
+  }
+
+  findAllFromPostCreatedDate(page: Page, createAt: Date) {
+    return this.subscriptionRepository.find({
+      where: {
+        page: page,
+        createAt: LessThanOrEqual(createAt),
+      },
+      relations: ['user'],
+    });
   }
 
   async remove(id: number, user: User) {

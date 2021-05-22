@@ -1,4 +1,6 @@
-import { BaseEntity } from '../../base/entity/base.entity';
+import { BaseEntity } from 'src/base/entity/base.entity';
+import { Page } from 'src/page/entities/page.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   JoinColumn,
@@ -6,8 +8,6 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
-import { Page } from '../../page/entities/page.entity';
 
 @Unique(['user', 'page'])
 @Entity()
