@@ -79,15 +79,15 @@ describe('UserController', () => {
   });
 
   it('should find single user', () => {
-    expect(controller.findOne('1')).toEqual(singleUserFixture);
+    expect(controller.findOne({ id: 'uuid' })).toEqual(singleUserFixture);
     expect(mockUsersService.findOne).toHaveBeenCalled();
   });
 
   it('should update a user', () => {
-    const dto = { name: 'hglee' };
+    const dto = { password: 'hglee', roles: ['admin', 'user'] };
 
-    expect(controller.update('1', dto)).toEqual({
-      id: '1',
+    expect(controller.update({ id: 'uuid' }, dto)).toEqual({
+      id: 'uuid',
       ...dto,
     });
 
@@ -95,7 +95,7 @@ describe('UserController', () => {
   });
 
   it('should remove user by id', () => {
-    expect(controller.remove('1')).toEqual(singleUserFixture);
+    expect(controller.remove({ id: 'uuid' })).toEqual(singleUserFixture);
     expect(mockUsersService.remove).toHaveBeenCalled();
   });
 });

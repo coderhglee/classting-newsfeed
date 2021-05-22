@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './../auth/auth.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './../user/entities/user.entity';
 import { UserService } from './../user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -78,10 +78,23 @@ describe('AuthService', () => {
         password: 'password',
         roles: ['admin', 'user'],
       });
+
       jest.spyOn(jwtService, 'sign').mockReturnValue('access_token');
-      expect(await authService.login(singleUserFixture)).toStrictEqual({
+      jest
+        .spyOn(authService, 'validateUser')
+        .mockResolvedValue(singleUserFixture);
+      expect(
+        await authService.login({ username: 'user_1', password: 'password' }),
+      ).toStrictEqual({
         access_token: 'access_token',
       });
+    });
+
+    it('유저 정보가 일치하지 않으면 에러를 반환한다.', async () => {
+      jest.spyOn(authService, 'validateUser').mockReturnValue(undefined);
+      await expect(
+        authService.login({ username: 'user_1', password: 'password' }),
+      ).rejects.toThrowError(UnauthorizedException);
     });
   });
 });
