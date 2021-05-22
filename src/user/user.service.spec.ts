@@ -50,18 +50,18 @@ describe('UserService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of users', async () => {
+    it('사용자 리스트를 반환한다.', async () => {
       const users = await service.findAll();
       expect(users).toEqual(multiUserFixture);
     });
   });
 
   describe('findOne', () => {
-    it('should get a single user', async () => {
+    it('단일 사용자를 조회 가능하다', async () => {
       await expect(service.findOne('uuid')).resolves.toEqual(singleUserFixture);
     });
 
-    it('should throw with message if not found user when find user', async () => {
+    it('존재하지 않는 사용자를 조회했을때 에러를 반환한다.', async () => {
       jest.spyOn(repo, 'findOne').mockResolvedValue(undefined);
       await expect(service.findOne('uuid')).rejects.toThrowError(
         NotFoundException,
@@ -70,16 +70,23 @@ describe('UserService', () => {
   });
 
   describe('create', () => {
-    it('should create a new user', async () => {
+    it('사용자를 생성할 수 있다.', async () => {
       expect(await service.create(singleUserFixture)).toEqual(
         singleUserFixture,
       );
       expect(repo.save).toHaveBeenCalled();
     });
+
+    it('사용자 생성에 실파하면 에러를 반환한다.', async () => {
+      jest.spyOn(repo, 'save').mockRejectedValue(Error);
+      await expect(service.create(singleUserFixture)).rejects.toThrowError(
+        BadRequestException,
+      );
+    });
   });
 
   describe('update', () => {
-    it('should update a user', async () => {
+    it('사용자를 수정할 수 있다.', async () => {
       const updateUser = new User({
         name: 'user_1_update',
         password: 'password',
@@ -94,23 +101,18 @@ describe('UserService', () => {
       expect(repo.save).toHaveBeenCalled();
     });
 
-    it('should throw with message if not found user when update user', async () => {
-      jest
-        .spyOn(service, 'findOne')
-        .mockRejectedValueOnce(new BadRequestException('Not Found User'));
+    it('사용자를 수정하는데 실패하면 에러를 반환한다', async () => {
+      jest.spyOn(repo, 'update').mockRejectedValue(Error);
       await expect(
         service.update('uuid', { name: 'hglee_update' }),
-      ).rejects.toThrowError('Not Found User');
-      expect(service.findOne).toHaveBeenCalledTimes(1);
+      ).rejects.toThrowError(BadRequestException);
     });
   });
 
   describe('remove', () => {
-    it('should throw with message if not found user when remove user', async () => {
-      jest
-        .spyOn(service, 'findOne')
-        .mockRejectedValueOnce(new BadRequestException('Not Found User'));
-      await expect(service.remove('uuid')).rejects.toThrow('Not Found User');
+    it('사용자를 삭제하는데 실패하면 에러를 반환한다', async () => {
+      jest.spyOn(repo, 'remove').mockRejectedValue(Error);
+      await expect(service.remove('uuid')).rejects.toThrow(BadRequestException);
     });
   });
 });

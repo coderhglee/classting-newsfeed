@@ -21,7 +21,9 @@ export class UserService {
 
   create(createUserDto: CreateUserDto) {
     const newUser = this.userRepository.create(createUserDto);
-    return this.userRepository.save(newUser);
+    return this.userRepository.save(newUser).catch(() => {
+      throw new BadRequestException(`사용자를 생성하는데 실패하였습니다.`);
+    });
   }
 
   findAll() {
@@ -53,7 +55,9 @@ export class UserService {
       })
       .catch((err) => {
         this.logger.error(`User Update Error cause ${err}`);
-        throw err;
+        throw new BadRequestException(
+          `사용자를 업데이트 하는데 실패하였습니다.`,
+        );
       });
   }
 
@@ -64,7 +68,7 @@ export class UserService {
       })
       .catch((err) => {
         this.logger.error(`User Remove Error cause ${err}`);
-        throw err;
+        throw new BadRequestException(`사용자를 삭제 하는데 실패하였습니다.`);
       });
   }
 }
