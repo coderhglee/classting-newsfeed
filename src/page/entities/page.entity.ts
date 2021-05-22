@@ -1,7 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from '../../post/entities/post.entity';
 
-@Entity()
+export const PAGE_ENTITY = 'page';
+
+@Entity(PAGE_ENTITY)
 export class Page {
   @PrimaryGeneratedColumn()
   id: number;

@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/base/entity/base.entity';
-import { Page } from 'src/page/entities/page.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Page, PAGE_ENTITY } from 'src/page/entities/page.entity';
+import { User, USER_ENTITY } from 'src/user/entities/user.entity';
 import {
   Entity,
   JoinColumn,
@@ -9,8 +9,10 @@ import {
   Unique,
 } from 'typeorm';
 
-@Unique(['user', 'page'])
-@Entity()
+export const SUBSCRIPTION_ENTITY = 'subscription';
+
+@Unique([USER_ENTITY, PAGE_ENTITY])
+@Entity(SUBSCRIPTION_ENTITY)
 export class Subscription extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

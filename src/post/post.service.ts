@@ -11,6 +11,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { PublishService } from 'src/publish/publish.service';
+import { PAGE_ENTITY } from 'src/page/entities/page.entity';
 
 @Injectable()
 export class PostService {
@@ -42,7 +43,7 @@ export class PostService {
 
   async findOneByRelatedPage(id: number) {
     const postById = await this.postRepository.findOne(id, {
-      relations: ['page'],
+      relations: [PAGE_ENTITY],
     });
     if (!postById) {
       throw new NotFoundException(`Post를 찾는데 실패하였습니다 ID: ${id}`);

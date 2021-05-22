@@ -2,7 +2,9 @@ import { Page } from '../../page/entities/page.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '../../base/entity/base.entity';
 
-@Entity()
+export const POST_ENTITY = 'post';
+
+@Entity(POST_ENTITY)
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

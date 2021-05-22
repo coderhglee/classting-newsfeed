@@ -2,7 +2,9 @@ import { Exclude } from 'class-transformer';
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-@Entity()
+export const USER_ENTITY = 'user';
+
+@Entity(USER_ENTITY)
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;

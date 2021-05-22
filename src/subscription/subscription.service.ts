@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageService } from '../page/page.service';
-import { User } from '../user/entities/user.entity';
+import { User, USER_ENTITY } from '../user/entities/user.entity';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
-import { Page } from '../page/entities/page.entity';
+import { Page, PAGE_ENTITY } from '../page/entities/page.entity';
 
 @Injectable()
 export class SubscriptionService {
@@ -36,7 +36,7 @@ export class SubscriptionService {
 
   async findAllSubscribePage(user: User) {
     return this.subscriptionRepository
-      .find({ where: { user: user }, relations: ['page'] })
+      .find({ where: { user: user }, relations: [PAGE_ENTITY] })
       .catch((error) => {
         this.logger.error(error);
         throw new NotFoundException(`구독중인 페이지를 찾을수 없습니다.`);
@@ -45,7 +45,7 @@ export class SubscriptionService {
 
   async findAllUserBySubscribePage(page: Page) {
     return this.subscriptionRepository
-      .find({ where: { page: page }, relations: ['user', 'page'] })
+      .find({ where: { page: page }, relations: [USER_ENTITY, PAGE_ENTITY] })
       .catch((error) => {
         this.logger.error(error);
         throw new NotFoundException(`구독 페이지 유저 정보를 찾을수 없습니다.`);
@@ -69,7 +69,7 @@ export class SubscriptionService {
         page: page,
         createAt: LessThanOrEqual(createAt),
       },
-      relations: ['user'],
+      relations: [USER_ENTITY],
     });
   }
 
