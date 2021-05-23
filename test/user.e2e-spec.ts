@@ -1,75 +1,88 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserModule } from '../src/user/user.module';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../src/user/entities/user.entity';
+import { AppModule } from 'src/app.module';
+import { resetEntity } from './util/orm-util';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
 
-  const mockUser = [{ id: 1, name: 'hglee' }];
+  const createMockUser = (mockApp: INestApplication, user: any) => {
+    return request(mockApp.getHttpServer()).post('/user').send(user);
+  };
 
-  const mockUserRepository = {
-    find: jest.fn().mockResolvedValue(mockUser),
-    create: jest.fn().mockImplementation((dto) => dto),
-    save: jest
-      .fn()
-      .mockImplementation((user) =>
-        Promise.resolve({ id: Date.now(), ...user }),
-      ),
+  const userFixture = { name: 'admin', password: 'admin', role: 'admin' };
+  const requestUserFixture = {
+    id: expect.any(String),
+    name: userFixture.name,
+    role: userFixture.role,
+    createAt: expect.any(String),
+    updateAt: expect.any(String),
   };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [UserModule],
-    })
-      .overrideProvider(getRepositoryToken(User))
-      .useValue(mockUserRepository)
-      .compile();
+      imports: [AppModule],
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
-  it('/user (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/user')
-      .set('Accept', 'application/json')
-      .expect(200)
-      .expect(mockUser);
-  });
-
-  it('/user (POST)', () => {
-    return request(app.getHttpServer())
-      .post('/user')
-      .send({ name: 'hglee', password: 'password', roles: ['admin', 'user'] })
-      .expect('Content-Type', /json/)
+  it('/user (POST)', async () => {
+    return createMockUser(app, userFixture)
       .expect(201)
       .then((res) => {
-        expect(res.body).toEqual({
-          id: expect.any(Number),
-          name: 'hglee',
-          password: 'password',
-          roles: ['admin', 'user'],
-        });
+        expect(res.body).toEqual(requestUserFixture);
       });
   });
 
-  it('/user (POST) 400 on validation error', () => {
-    return request(app.getHttpServer())
-      .post('/user')
-      .send({ name: 12345 })
-      .expect('Content-Type', /json/)
-      .expect(400, {
-        statusCode: 400,
-        message: [
-          'name must be a string',
-          'password must be a string',
-          'roles must be an array',
-        ],
-        error: 'Bad Request',
+  it('/user (GET)', async () => {
+    // given
+    const createMockRequest = await createMockUser(app, userFixture);
+    const { id, name } = createMockRequest.body;
+    // when then
+    await request(app.getHttpServer())
+      .get(`/user/${id}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual(requestUserFixture);
       });
+    await request(app.getHttpServer())
+      .get(`/user/name/${name}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual(requestUserFixture);
+      });
+  });
+
+  it('/user (Patch)', async () => {
+    // given
+    const createMockRequest = await createMockUser(app, userFixture);
+    const { id } = createMockRequest.body;
+    // when then
+    return request(app.getHttpServer())
+      .patch(`/user/${id}`)
+      .send({ password: 'password_update', role: 'user' })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.password).toEqual('password_update');
+        expect(res.body.role).toEqual('user');
+      });
+  });
+
+  it('/user (Delete)', async () => {
+    // given
+    const createMockRequest = await createMockUser(app, userFixture);
+    const { id } = createMockRequest.body;
+    // when then
+    await request(app.getHttpServer()).delete(`/user/${id}`).expect(200);
+    await request(app.getHttpServer()).get(`/user/${id}`).expect(404);
+  });
+
+  afterEach(async () => {
+    await app.close();
+    await resetEntity();
   });
 });

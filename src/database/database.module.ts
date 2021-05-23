@@ -8,6 +8,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => {
+        if (process.env.NODE_ENV === 'test') {
+          return {
+            name: 'default',
+            type: 'sqlite',
+            database: ':memory:',
+            keepConnectionAlive: true,
+            logging: true,
+            synchronize: true,
+            dropSchema: true,
+            entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          };
+        }
         return {
           type: 'mysql',
           host: config.get('DATABASE_HOST') || 'localhost',

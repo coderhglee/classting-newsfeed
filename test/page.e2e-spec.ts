@@ -1,37 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { PageModule } from '../src/page/page.module';
-import { Page } from '../src/page/entities/page.entity';
-import { User } from '../src/user/entities/user.entity';
-import { PageService } from '../src/page/page.service';
+import { User, UserRole } from '../src/user/entities/user.entity';
 import { RolesGuard } from '../src/auth/guard/roles.guard';
 import { JwtAuthGuard } from '../src/auth/guard/jwt-auth.guard';
+import { AppModule } from 'src/app.module';
+import { CreatePageDto } from 'src/page/dto/create-page.dto';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
+  const mockUser: User = new User({
+    id: 'uuid',
+    name: 'user',
+    password: 'password',
+    role: UserRole.ADMIN,
+  });
+
   const authGuardMock = {
     canActivate: (context: ExecutionContext): any => {
       const req = context.switchToHttp().getRequest();
-      req.user = { id: 1 };
+      req.user = mockUser;
       return true;
     },
   };
   const rolesGuardMock = { canActivate: (): any => true };
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [PageModule],
+      imports: [AppModule],
     })
-      .overrideProvider(getRepositoryToken(Page))
-      .useValue({})
-      .overrideProvider(getRepositoryToken(User))
-      .useValue({})
-      .overrideProvider(PageService)
-      .useValue({
-        create: jest.fn().mockResolvedValue({}),
-      })
       .overrideGuard(RolesGuard)
       .useValue(rolesGuardMock)
       .overrideGuard(JwtAuthGuard)
@@ -43,10 +40,37 @@ describe('AppController (e2e)', () => {
   });
 
   it('/page (POST)', () => {
+    // given
+    const mockPage = new CreatePageDto({
+      name: 'test_page',
+      region: 'test_region',
+    });
+    // when then
     return request(app.getHttpServer())
       .post('/page')
-      .set('Authorization', 'Bearer token')
-      .set('Accept', 'application/json')
+      .send(mockPage)
       .expect(201);
+  });
+
+  it('/get (Patch)', async () => {
+    // given
+    const mockPage = new CreatePageDto({
+      name: 'test_page',
+      region: 'test_region',
+    });
+    const createdPage = await request(app.getHttpServer())
+      .post('/page')
+      .send(mockPage);
+    const { id, name, region } = createdPage.body;
+    // when
+    const updateRequest = await request(app.getHttpServer()).get(`/page/${id}`);
+    // then
+    expect(updateRequest.status).toBe(200);
+    expect(updateRequest.body.name).toBe(name);
+    expect(updateRequest.body.region).toBe(region);
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 });
