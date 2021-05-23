@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
+import { User, UserRole } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 const multiUserFixture = [
-  new User({ name: 'user_1', password: 'password', roles: ['admin', 'user'] }),
-  new User({ name: 'user_2', password: 'password', roles: ['admin', 'user'] }),
-  new User({ name: 'user_3', password: 'password', roles: ['admin', 'user'] }),
+  new User({ name: 'user_1', password: 'password', role: UserRole.ADMIN }),
+  new User({ name: 'user_2', password: 'password', role: UserRole.ADMIN }),
+  new User({ name: 'user_3', password: 'password', role: UserRole.ADMIN }),
 ];
 
 const singleUserFixture = new User({
   name: 'user_1',
   password: 'password',
-  roles: ['admin', 'user'],
+  role: UserRole.ADMIN,
 });
 
 const mockUserRepository = {
@@ -90,13 +90,16 @@ describe('UserService', () => {
       const updateUser = new User({
         name: 'user_1_update',
         password: 'password',
-        roles: ['admin', 'user'],
+        role: UserRole.ADMIN,
       });
       jest.spyOn(service, 'findOne').mockResolvedValue(singleUserFixture);
       jest.spyOn(repo, 'save').mockResolvedValue(updateUser);
-      expect(await service.update('uuid', { name: updateUser.name })).toEqual(
-        updateUser,
-      );
+      expect(
+        await service.update('uuid', {
+          password: 'pass_update',
+          role: UserRole.USER,
+        }),
+      ).toEqual(updateUser);
       expect(service.findOne).toHaveBeenCalled();
       expect(repo.save).toHaveBeenCalled();
     });
@@ -104,7 +107,10 @@ describe('UserService', () => {
     it('사용자를 수정하는데 실패하면 에러를 반환한다', async () => {
       jest.spyOn(repo, 'update').mockRejectedValue(Error);
       await expect(
-        service.update('uuid', { name: 'hglee_update' }),
+        service.update('uuid', {
+          password: 'pass_update',
+          role: UserRole.USER,
+        }),
       ).rejects.toThrowError(BadRequestException);
     });
   });

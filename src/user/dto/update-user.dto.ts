@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { UserRole } from '../entities/user.entity';
 
 export class UpdateUserDto {
   @IsString()
@@ -7,8 +8,8 @@ export class UpdateUserDto {
   @ApiProperty()
   readonly password: string;
 
-  @IsArray()
+  @IsEnum(UserRole)
   @IsNotEmpty()
-  @ApiProperty()
-  readonly roles: string[];
+  @ApiProperty({ enum: UserRole })
+  readonly role: UserRole;
 }

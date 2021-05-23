@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './../auth/guard/jwt-auth.guard';
 import { Roles, RolesGuard } from './../auth/guard/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { FindPageIdParamDto } from './dto/find-page-id.param.dto';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @ApiTags('Page')
 @Controller('page')
@@ -22,7 +23,7 @@ export class PageController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   create(@Request() req, @Body() createPageDto: CreatePageDto) {
     return this.pageService.create(req.user, createPageDto);
   }

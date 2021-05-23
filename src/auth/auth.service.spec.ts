@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './../auth/auth.service';
-import { User } from './../user/entities/user.entity';
+import { User, UserRole } from './../user/entities/user.entity';
 import { UserService } from './../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
@@ -44,7 +44,7 @@ describe('AuthService', () => {
       const singleUserFixture = new User({
         name: 'user_1',
         password: 'password',
-        roles: ['admin', 'user'],
+        role: UserRole.ADMIN,
       });
       jest
         .spyOn(usersService, 'findByName')
@@ -59,7 +59,7 @@ describe('AuthService', () => {
       const singleUserFixture = new User({
         name: 'user_1',
         password: 'password',
-        roles: ['admin', 'user'],
+        role: UserRole.ADMIN,
       });
       jest.spyOn(singleUserFixture, 'comparePassword').mockReturnValue(false);
       jest
@@ -76,7 +76,7 @@ describe('AuthService', () => {
       const singleUserFixture = new User({
         name: 'user_1',
         password: 'password',
-        roles: ['admin', 'user'],
+        role: UserRole.ADMIN,
       });
 
       jest.spyOn(jwtService, 'sign').mockReturnValue('access_token');

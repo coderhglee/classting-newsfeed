@@ -5,6 +5,11 @@ import { BaseEntity } from 'src/base/entity/base.entity';
 
 export const USER_ENTITY = 'user';
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
 @Entity(USER_ENTITY)
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -19,8 +24,12 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Column('simple-array')
-  roles: string[];
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @BeforeInsert()
   encrypt() {
@@ -31,8 +40,8 @@ export class User extends BaseEntity {
     return bcrypt.compareSync(inputPassword, this.password);
   }
 
-  hasRole(role: string): boolean {
-    return this.roles.includes(role);
+  hasRole(role: UserRole): boolean {
+    return this.role === role;
   }
 
   constructor(partial: Partial<User>) {
