@@ -1,4 +1,5 @@
 import {
+  ClassSerializerInterceptor,
   ExecutionContext,
   INestApplication,
   ValidationPipe,
@@ -15,8 +16,9 @@ import * as request from 'supertest';
 import { CreatePageDto } from 'src/page/dto/create-page.dto';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { resetEntity } from './util/orm-util';
+import { Reflector } from '@nestjs/core';
 
-describe('AppController (e2e)', () => {
+describe('PostController (e2e)', () => {
   let app: INestApplication;
 
   const mockUser: User = new User({
@@ -47,6 +49,8 @@ describe('AppController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    const reflector = app.get(Reflector);
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });

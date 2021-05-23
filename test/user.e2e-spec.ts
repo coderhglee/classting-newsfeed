@@ -1,8 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from 'src/app.module';
 import { resetEntity } from './util/orm-util';
+import { Reflector } from '@nestjs/core';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
@@ -27,6 +32,8 @@ describe('UserController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
+    const reflector = app.get(Reflector);
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
     await app.init();
   });
 

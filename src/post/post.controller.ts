@@ -29,7 +29,7 @@ export class PostController {
 
   @Get(':id')
   findOne(@Param() param: FindPostIdParamDto) {
-    return this.postService.findOneByRelatedPage(+param.id);
+    return this.postService.findOneByRelatedPage(param.id);
   }
 
   @UseGuards(JwtAuthGuard, UserIsOwnerGuard)
@@ -38,12 +38,12 @@ export class PostController {
     @Param() param: FindPostIdParamDto,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    return this.postService.update(+param.id, updatePostDto);
+    return this.postService.update(param.id, updatePostDto);
   }
 
   @UseGuards(JwtAuthGuard, UserIsOwnerGuard)
   @Delete(':id')
   remove(@Param() param: FindPostIdParamDto) {
-    return this.postService.remove(+param.id);
+    return this.postService.remove(param.id);
   }
 }

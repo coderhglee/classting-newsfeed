@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class FindSubscriptionPageIdParamDto {
-  @IsNumber()
-  @IsNotEmpty()
   @ApiProperty()
+  @IsNumber()
+  @Type(() => Number)
   readonly pageId: number;
 
   constructor(partial: Partial<FindSubscriptionPageIdParamDto>) {

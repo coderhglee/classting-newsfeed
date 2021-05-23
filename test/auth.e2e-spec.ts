@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
+  ClassSerializerInterceptor,
   ExecutionContext,
   INestApplication,
   ValidationPipe,
@@ -8,8 +9,9 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { JwtAuthGuard } from '../src/auth/guard/jwt-auth.guard';
 import { RolesGuard } from '../src/auth/guard/roles.guard';
+import { Reflector } from '@nestjs/core';
 
-describe('AppController (e2e)', () => {
+describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
   const authGuardMock = {
@@ -32,6 +34,8 @@ describe('AppController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    const reflector = app.get(Reflector);
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });

@@ -6,8 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,7 +15,6 @@ import { FindUserIdParamDto } from './dto/find-user-id.param.dto';
 import { FindUserNameParamDto } from './dto/find-user-name.param.dto';
 
 @ApiTags('User')
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

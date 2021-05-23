@@ -1,13 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ExecutionContext, INestApplication } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  ExecutionContext,
+  INestApplication,
+} from '@nestjs/common';
 import * as request from 'supertest';
 import { User, UserRole } from '../src/user/entities/user.entity';
 import { RolesGuard } from '../src/auth/guard/roles.guard';
 import { JwtAuthGuard } from '../src/auth/guard/jwt-auth.guard';
 import { AppModule } from 'src/app.module';
 import { CreatePageDto } from 'src/page/dto/create-page.dto';
+import { Reflector } from '@nestjs/core';
 
-describe('AppController (e2e)', () => {
+describe('PageController (e2e)', () => {
   let app: INestApplication;
 
   const mockUser: User = new User({
@@ -36,6 +41,8 @@ describe('AppController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    const reflector = app.get(Reflector);
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
     await app.init();
   });
 
