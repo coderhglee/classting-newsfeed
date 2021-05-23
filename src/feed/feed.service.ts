@@ -11,7 +11,7 @@ export class FeedService {
     private readonly eventStore: PublishEventStore,
   ) {}
 
-  findNewsFeed(offset?: number, limit?: number, user?: User) {
+  async findNewsFeed(offset?: number, limit?: number, user?: User) {
     return this.eventStore
       .getPublishedEvent(offset, limit, user)
       .then((result) =>
