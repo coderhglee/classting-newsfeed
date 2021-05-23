@@ -12,6 +12,7 @@ import { CreatePageDto } from './dto/create-page.dto';
 import { JwtAuthGuard } from './../auth/guard/jwt-auth.guard';
 import { Roles, RolesGuard } from './../auth/guard/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { FindPageIdParamDto } from './dto/find-page-id.param.dto';
 
 @ApiTags('Page')
 @Controller('page')
@@ -27,7 +28,7 @@ export class PageController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pageService.findById(+id);
+  findOne(@Param() param: FindPageIdParamDto) {
+    return this.pageService.findById(param.id);
   }
 }

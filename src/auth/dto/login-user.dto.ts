@@ -11,4 +11,8 @@ export class LoginUserDto {
   @IsNotEmpty()
   @ApiProperty()
   password: string;
+
+  constructor(partial: Partial<LoginUserDto>) {
+    Object.assign(this, partial);
+  }
 }

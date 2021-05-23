@@ -1,15 +1,15 @@
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
 export class SearchFeedDto {
+  @ApiProperty()
   @IsOptional()
-  @Type(() => Number)
   @IsNumber()
   @Min(0)
   offset?: number;
 
+  @ApiProperty()
   @IsOptional()
-  @Type(() => Number)
   @IsNumber()
   @Min(1)
   limit?: number;

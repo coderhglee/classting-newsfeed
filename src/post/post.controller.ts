@@ -14,6 +14,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from './../auth/guard/jwt-auth.guard';
 import { UserIsOwnerGuard } from './guards/user-is-owner.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { FindPostIdParamDto } from './dto/find-post-id.param.dto';
 
 @ApiTags('Post')
 @Controller('post')
@@ -27,19 +28,22 @@ export class PostController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOneByRelatedPage(+id);
+  findOne(@Param() param: FindPostIdParamDto) {
+    return this.postService.findOneByRelatedPage(param.id);
   }
 
   @UseGuards(JwtAuthGuard, UserIsOwnerGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  update(
+    @Param() param: FindPostIdParamDto,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    return this.postService.update(param.id, updatePostDto);
   }
 
   @UseGuards(JwtAuthGuard, UserIsOwnerGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  remove(@Param() param: FindPostIdParamDto) {
+    return this.postService.remove(param.id);
   }
 }

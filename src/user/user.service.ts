@@ -19,7 +19,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const newUser = this.userRepository.create(createUserDto);
     return this.userRepository.save(newUser).catch(() => {
       throw new BadRequestException(`사용자를 생성하는데 실패하였습니다.`);

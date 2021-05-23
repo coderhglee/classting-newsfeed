@@ -7,6 +7,7 @@ import { PostService } from './post.service';
 import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
+import { FindPostIdParamDto } from './dto/find-post-id.param.dto';
 
 describe('PostController', () => {
   let controller: PostController;
@@ -46,7 +47,10 @@ describe('PostController', () => {
   it('findOne', async () => {
     const postFixture = expect.any(Post);
     jest.spyOn(service, 'findOneByRelatedPage').mockResolvedValue(postFixture);
-    expect(await controller.findOne('1')).toBe(postFixture);
+
+    expect(await controller.findOne(new FindPostIdParamDto({ id: 1 }))).toBe(
+      postFixture,
+    );
   });
 
   it('create', async () => {
@@ -60,14 +64,19 @@ describe('PostController', () => {
   it('update', async () => {
     const postFixture = expect.any(Post);
     jest.spyOn(service, 'update').mockResolvedValue(postFixture);
-    expect(await controller.update('1', expect.any(UpdatePostDto))).toBe(
-      postFixture,
-    );
+    expect(
+      await controller.update(
+        new FindPostIdParamDto({ id: 1 }),
+        expect.any(UpdatePostDto),
+      ),
+    ).toBe(postFixture);
   });
 
   it('remove', async () => {
     const postFixture = expect.any(Post);
     jest.spyOn(service, 'remove').mockResolvedValue(postFixture);
-    expect(await controller.remove('1')).toBe(postFixture);
+    expect(await controller.remove(new FindPostIdParamDto({ id: 1 }))).toBe(
+      postFixture,
+    );
   });
 });

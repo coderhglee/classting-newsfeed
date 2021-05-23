@@ -1,6 +1,8 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { FindSubscriptionIdParamDto } from './dto/find-subscription-id.param.dto';
+import { FindSubscriptionPageIdParamDto } from './dto/find-subscription-pageId.param.dto';
 import { Subscription } from './entities/subscription.entity';
 import { SubscriptionController } from './subscription.controller';
 import { SubscriptionService } from './subscription.service';
@@ -60,16 +62,22 @@ describe('SubscriptionController', () => {
   it('removeSubscribtion', async () => {
     const subFixture = new Subscription({});
     jest.spyOn(service, 'subscribePage').mockResolvedValue(subFixture);
-    expect(await controller.subscribePage(loginUserRequest, '1')).toBe(
-      subFixture,
-    );
+    expect(
+      await controller.subscribePage(
+        loginUserRequest,
+        new FindSubscriptionPageIdParamDto({ pageId: 1 }),
+      ),
+    ).toBe(subFixture);
   });
 
   it('should be defined', async () => {
     const subFixture = new Subscription({});
     jest.spyOn(service, 'remove').mockResolvedValue(subFixture);
-    expect(await controller.removeSubscribtion(loginUserRequest, '1')).toBe(
-      subFixture,
-    );
+    expect(
+      await controller.removeSubscribtion(
+        loginUserRequest,
+        new FindSubscriptionIdParamDto({ id: 1 }),
+      ),
+    ).toBe(subFixture);
   });
 });

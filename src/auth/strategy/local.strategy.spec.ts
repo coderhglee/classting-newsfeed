@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../../user/entities/user.entity';
 import { AuthService } from '../auth.service';
+import { LoginUserDto } from '../dto/login-user.dto';
 import { LocalStrategy } from './local.strategy';
 
 describe('LocalStrategy', () => {
@@ -34,13 +35,19 @@ describe('LocalStrategy', () => {
       name: 'hglee',
     });
     jest.spyOn(authService, 'validateUser').mockResolvedValue(userFixture);
-    expect(await strategy.validate('admin', 'admin')).toBe(userFixture);
+    expect(
+      await strategy.validate(
+        new LoginUserDto({ username: 'admin', password: 'admin' }),
+      ),
+    ).toBe(userFixture);
   });
 
   it('should validate throw exception', async () => {
     jest.spyOn(authService, 'validateUser').mockResolvedValue(undefined);
     try {
-      await strategy.validate('admin', 'admin');
+      await strategy.validate(
+        new LoginUserDto({ username: 'admin', password: 'admin' }),
+      );
     } catch (error) {
       expect(error.getResponse()).toStrictEqual({
         message: 'Unauthorized',
