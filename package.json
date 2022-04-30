@@ -22,7 +22,7 @@
     "test:e2e:watch": "jest --config ./test/jest-e2e.json --watch"
   },
   "dependencies": {
-    "@nestjs/common": "^7.6.15",
+    "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
     "@nestjs/jwt": "^7.2.0",
